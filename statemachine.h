@@ -2,9 +2,10 @@
 
 #include<string>
 #include<vector>
-#include<map>
 
 class StateMachine {
 public:
-	std::map
+	StateMachine();
+	enum State {IDLE, STATEMENT, EXPRESSION, FUNCTION_ASSIGNEMENT, CONDITION, IF, ELSE, WHILE};
+	State state;
 };
