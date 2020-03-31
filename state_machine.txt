@@ -1,0 +1,16 @@
+State Machine:
+	state = IDLE
+	if (token.type == variable)
+		state = STATEMENT
+		pc++
+		if (token.type == EQUAL)
+			if(token.type == number)
+			state = EXPRESSION
+			pc++
+			if (token.type == STRING)
+				variables[current_variable] = token.value
+				current_variable = "null"
+				pc++
+			end
+		end
+	end
