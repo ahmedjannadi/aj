@@ -1,16 +1,42 @@
 State Machine:
-	state = IDLE
-	if (token.type == variable)
-		state = STATEMENT
-		pc++
-		if (token.type == EQUAL)
-			if(token.type == number)
-			state = EXPRESSION
+	if(state == IDLE) {
+		if(token == variable) {
+			state = STATEMENT
+		}
+	}
+
+	if(state == STATEMENT) {
+		if(token == variable) {
+			variable = token[pc-1].value
 			pc++
-			if (token.type == STRING)
-				variables[current_variable] = token.value
-				current_variable = "null"
+			if(token == "=") {
 				pc++
-			end
-		end
-	end
+				state = expression
+			} else if(token == "(") {
+					pc++
+				if(token == ")") {
+					call_function(functions[variable])
+					pc++
+					state = IDLE
+				} else if (token == variable) {
+					stack_add(variables[token])
+					pc++
+					while(token== ',') {
+						pc++
+						if(token==variable) {
+							stack_add(variables[token])
+							pc++
+						}
+					}
+					if(token == ")" ) {
+						call_function()
+						state = IDLE
+					}
+
+
+				}
+			}
+		} else {
+			error();
+		}
+	}

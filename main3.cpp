@@ -10,13 +10,6 @@ int main() {
 	auto tokens = interpreter.tokenizer.getTokens(test);
 
 	//interpreter.interpret(tokens);
+	interpreter.interpreter_console();
 
-	std::cout << "AJ Interpreter version 0.1" << std::endl;
-	std::string s;
-	while(true) {
-		std::cout << ">" ;
-		std::getline(std::cin, s);
-		interpreter.interpret(interpreter.tokenizer.getTokens(s));
-	}
-	return 0;
 }
