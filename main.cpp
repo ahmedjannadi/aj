@@ -127,5 +127,4 @@ int main() {
 		tokens = split(s);
 		execute(tokens);
 	}
-	//std::cout << std::stoi("10")+10 << std::endl;
 }

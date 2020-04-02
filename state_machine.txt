@@ -40,3 +40,24 @@ State Machine:
 			error();
 		}
 	}
+
+
+
+
+
+
+
+
+a.b
+
+
+
+
+// variable
+
+if(token == VARIABLE) {
+	if(token + 1 == ++)
+		++
+	else if token + 1 == --
+		--
+}

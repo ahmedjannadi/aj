@@ -17,6 +17,9 @@ public:
 	void interpret(std::vector<Token> tokens);
 	void interpreter_console();
 	void changePC(int i);
+
+	std::string getVariable();
+
 	Token getToken(int pc);
 
 	bool running = false;

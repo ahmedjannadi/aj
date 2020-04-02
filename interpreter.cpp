@@ -15,6 +15,12 @@ Token Interpreter::getToken(int pc) {
 	return Token("NULL","NULL");
 }
 
+std::string Interpreter::getVariable() {
+	if(getToken(pc).type != "VARIABLE") {
+		std::cerr << "Error parsing variable" << std::endl;
+	}
+}
+
 void Interpreter::interpret(std::vector<Token> t) {
 	tokens = t;
 	std::string variable = "";
@@ -27,18 +33,18 @@ void Interpreter::interpret(std::vector<Token> t) {
 			if(getToken(pc).type == "VARIABLE") {
 					stateMachine.state = StateMachine::STATEMENT;
 			}
-			else if(getToken(pc).type == "PRINT") {
+			else if(getToken(pc).type == "print") {
 				stateMachine.state = StateMachine::PRINT;
 			}
 			else {
 				std::cerr << "Error" << std::endl;
+				running = false;
 			}
-		}
-		if(stateMachine.state == StateMachine::STATEMENT) {
+		} else if(stateMachine.state == StateMachine::STATEMENT) {
 			if(tokens[pc].type == "VARIABLE") {
+				variable = tokens[pc].value;
 				pc++;
 				if(tokens[pc].type == "=") {
-					variable = tokens[pc-1].value;
 					pc++;
 					if(tokens[pc].type == "NUMBER") {
 						variables.insert_or_assign(variable,tokens[pc].value);
@@ -46,44 +52,50 @@ void Interpreter::interpret(std::vector<Token> t) {
 						stateMachine.state = StateMachine::IDLE;
 						changePC(pc + 1);
 					}
+				} else if (getToken(pc).value == "++") {
+					variable = tokens[pc-1].value;
+					int tmp = std::stoi(variables[variable]);
+					variables[variable] = std::to_string(++tmp);
+					variable = "";
+					stateMachine.state = StateMachine::IDLE;
+					pc++;
 				} else {
-					std::cerr << "wrong syntax -> " + tokens[pc-1].value << std::endl;
+					std::cerr << "wrong syntax -> " + tokens[pc-1].value + " " + tokens[pc].type << std::endl;
 					running = false;
 				}
-			} else if(tokens[pc].type == "print") {
-					stateMachine.state = StateMachine::STATEMENT;
-					changePC(pc + 1);
-					if(tokens[pc].type == "(") {
-							changePC(pc + 1);
-							std::string string_to_print = "";
-							if(tokens[pc].type == "NUMBER") {
-								//std::cout << tokens[pc].value;
-								string_to_print = tokens[pc].value;
-							}
-							else if(tokens[pc].type == "VARIABLE") {
-								//std::cout << variables[tokens[pc]] << std::end;
-								string_to_print = variables[tokens[pc].value];
-							}
-							else {
-								std::cerr << "Expected a variable or a number (or a string WIP)" << std::endl;
-								running = false;
-							}
-							changePC(pc + 1);
-							if(tokens[pc].type == ")") {
-								std::cout << string_to_print << std::endl;
-								stateMachine.state = StateMachine::IDLE;
-								changePC(pc + 1);
-							}
-							else {
-								std::cerr << "Expected ) after print" << std::endl;
-								running = false;
-							}
-					}else {
-						std::cout << "Expected after print (" << std::endl;
+			} 
+		} else if(stateMachine.state == StateMachine::PRINT) {
+			changePC(pc + 1);
+			if(tokens[pc].type == "(") {
+					pc++;
+					std::string string_to_print = "";
+					if(tokens[pc].type == "NUMBER") {
+						//std::cout << tokens[pc].value;
+						string_to_print = tokens[pc].value;
+					}
+					else if(tokens[pc].type == "VARIABLE") {
+						//std::cout << variables[tokens[pc]] << std::end;
+						string_to_print = variables[tokens[pc].value];
+					}
+					else {
+						std::cerr << "Expected a variable or a number (or a string WIP)" << std::endl;
 						running = false;
 					}
+					pc++;
+					if(tokens[pc].type == ")") {
+						std::cout << string_to_print << std::endl;
+						stateMachine.state = StateMachine::IDLE;
+						pc++;
+					}
+					else {
+						std::cerr << "Expected ) after print" << std::endl;
+						running = false;
+					}
+			}else {
+				std::cout << "Expected after print (" << std::endl;
+				running = false;
 			}
-		}else {
+		} else {
 			running = false;
 		}
 	}
