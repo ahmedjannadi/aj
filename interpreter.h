@@ -4,6 +4,7 @@
 
 #include"tokenizer.h"
 #include"statemachine.h"
+#include"variable.h"
 
 class Interpreter {
 public:
@@ -12,7 +13,7 @@ public:
 	StateMachine stateMachine;
 
 	std::vector<Token> tokens;
-	std::map<std::string, std::string> variables;
+	std::map<std::string, Variable> variables;
 
 	void interpret(std::vector<Token> tokens);
 	void interpreter_console();

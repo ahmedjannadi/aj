@@ -47,15 +47,16 @@ void Interpreter::interpret(std::vector<Token> t) {
 				if(tokens[pc].type == "=") {
 					pc++;
 					if(tokens[pc].type == "NUMBER") {
-						variables.insert_or_assign(variable,tokens[pc].value);
+						variables.insert_or_assign(variable,Variable("NULL",tokens[pc].value));
+						//variables.insert_or_assign(variable,Variable());
 						variable = "";
 						stateMachine.state = StateMachine::IDLE;
 						changePC(pc + 1);
 					}
 				} else if (getToken(pc).value == "++") {
 					variable = tokens[pc-1].value;
-					int tmp = std::stoi(variables[variable]);
-					variables[variable] = std::to_string(++tmp);
+					int tmp = std::stoi(variables[variable].value);
+					variables[variable].value = std::to_string(++tmp);
 					variable = "";
 					stateMachine.state = StateMachine::IDLE;
 					pc++;
@@ -75,7 +76,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 					}
 					else if(tokens[pc].type == "VARIABLE") {
 						//std::cout << variables[tokens[pc]] << std::end;
-						string_to_print = variables[tokens[pc].value];
+						string_to_print = variables[tokens[pc].value].value;
 					}
 					else {
 						std::cerr << "Expected a variable or a number (or a string WIP)" << std::endl;
