@@ -16,9 +16,14 @@ Token Interpreter::getToken(int pc) {
 }
 
 std::string Interpreter::getVariable() {
+	std::string variable = "";
 	if(getToken(pc).type != "VARIABLE") {
 		std::cerr << "Error parsing variable" << std::endl;
+	} else {
+		variable = tokens[pc].value;
+		pc++;
 	}
+	return variable;
 }
 
 void Interpreter::interpret(std::vector<Token> t) {
@@ -42,8 +47,9 @@ void Interpreter::interpret(std::vector<Token> t) {
 			}
 		} else if(stateMachine.state == StateMachine::STATEMENT) {
 			if(tokens[pc].type == "VARIABLE") {
-				variable = tokens[pc].value;
-				pc++;
+				//variable = tokens[pc].value;
+				//pc++;
+				variable = getVariable();
 				if(tokens[pc].type == "=") {
 					pc++;
 					if(tokens[pc].type == "NUMBER") {

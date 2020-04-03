@@ -4,6 +4,7 @@ Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("function");
 	reserved_tokens.push_back("end");
 	reserved_tokens.push_back("print");
+	reserved_tokens.push_back("type");
 }
 
 bool Tokenizer::checkChar(char c, std::string str) {
