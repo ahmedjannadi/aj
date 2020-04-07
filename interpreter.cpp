@@ -35,8 +35,22 @@ std::string Interpreter::getVariableName() {
 	return variable_name;
 }
 
+Variable Interpreter::doExpression() {
+	Variable variable(Variable::NIL,"nil");
+	
+	variable = getExpression();
+	while(getToken(pc).value == "+") {
+		pc++;
+		Variable variable2 = getExpression();
+		variable.value += variable2.value;
+	}
+
+	return variable;
+}
+
 Variable Interpreter::getExpression() {
 	Variable variable = Variable(Variable::NIL,"nil");
+
 	if(getToken(pc).type == "NUMBER") {
 		variable.type = Variable::NUMBER;
 		variable.value = getToken(pc).value;
@@ -46,25 +60,36 @@ Variable Interpreter::getExpression() {
 	}else if(getToken(pc).type == "STRING"){
 		variable.type = Variable::STRING;
 		variable.value = getToken(pc).value;
+		pc++;
 	}
 	
 	Variable::Type type = variable.type;
-	while(getToken(pc).type == "+") { //
-	//if(getToken(pc).value == "+") {
+	//while(getToken(pc).value == "+") { //
+	if(getToken(pc).value == "+") {
 		int old_pc = pc;
 		pc++;
 		Variable variable2 = getExpression();
-		if(variable.type == Variable::STRING){ 
-			if(variable2.type != Variable::STRING) {
+		if(variable2.type == Variable::STRING){ 
+			if(variable.type == Variable::STRING) {
 				variable.value +=  variable2.value;
 				variable.type = Variable::STRING;
-			}else {
-				
+			} else {
+				pc = old_pc;
+				std::cout << "PC: " << pc << " Tokens[pc]: " <<  getToken(pc).value << std::endl;
 			}
-		} else {
-			variable.value = std::to_string(std::stoi(variable.value)+std::stoi(variable2.value));
+
+		} else if(variable2.type == Variable::NUMBER) {
+			if(variable.type == Variable::NUMBER) {
+				variable.value = std::to_string(std::stoi(variable.value)+std::stoi(variable2.value));
+			} else {
+				pc = old_pc;
+				std::cout << "PC: " << pc << " Tokens[pc]: " <<  getToken(pc).value << std::endl;
+			}
 		}
 	}
+
+
+	//std::cout << "Token[pc] = " << getToken(pc).value << std::endl;
 
 	return variable;
 }
@@ -85,7 +110,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 				stateMachine.state = StateMachine::PRINT;
 			}
 			else {
-				std::cerr << "Error" << std::endl;
+				std::cerr << "Error on : " << tokens[pc].value << std::endl;
 				running = false;
 			}
 		} else if(stateMachine.state == StateMachine::STATEMENT) {
@@ -101,7 +126,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 						stateMachine.state = StateMachine::IDLE;
 						changePC(pc + 1);
 					}*/
-					variables.insert_or_assign(variable_name,getExpression());
+					variables.insert_or_assign(variable_name,doExpression());
 					variable_name = "";
 					stateMachine.state = StateMachine::IDLE;
 					pc++;
@@ -160,5 +185,8 @@ void Interpreter::interpreter_console() {
 		std::cout << ">" ;
 		std::getline(std::cin, s);
 		interpret(tokenizer.getTokens(s));
+		//for(int i=0; i<tokens.size(); i++) {
+		//	std::cout << tokens[i].value << std::endl;
+		//}
 	}
 }

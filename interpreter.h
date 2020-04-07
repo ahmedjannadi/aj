@@ -21,6 +21,7 @@ public:
 
 	Variable getVariable();
 	Variable getExpression();
+	Variable doExpression();
 
 	std::string getVariableName();
 	std::string getString();

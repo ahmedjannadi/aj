@@ -50,9 +50,13 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 		} else if(checkChar(str[i],"(){}[]=,;:")) {
 			type = str[i];
 		}else if(checkChar(str[i],"\"\'")){
+				if(!to_string) {
+					type = "STRING";
+					i++;
+				} else {
+					type = "";
+				}
 				to_string = !to_string;
-				type = "STRING";
-		
 		} else {
 			type = "";
 		}
