@@ -75,7 +75,6 @@ Variable Interpreter::getExpression() {
 				variable.type = Variable::STRING;
 			} else {
 				pc = old_pc;
-				std::cout << "PC: " << pc << " Tokens[pc]: " <<  getToken(pc).value << std::endl;
 			}
 
 		} else if(variable2.type == Variable::NUMBER) {
@@ -83,13 +82,10 @@ Variable Interpreter::getExpression() {
 				variable.value = std::to_string(std::stoi(variable.value)+std::stoi(variable2.value));
 			} else {
 				pc = old_pc;
-				std::cout << "PC: " << pc << " Tokens[pc]: " <<  getToken(pc).value << std::endl;
 			}
 		}
 	}
 
-
-	//std::cout << "Token[pc] = " << getToken(pc).value << std::endl;
 
 	return variable;
 }
@@ -145,22 +141,9 @@ void Interpreter::interpret(std::vector<Token> t) {
 			changePC(pc + 1);
 			if(tokens[pc].type == "(") {
 					pc++;
-					std::string string_to_print = "";
-					if(tokens[pc].type == "NUMBER") {
-						//std::cout << tokens[pc].value;
-						string_to_print = tokens[pc].value;
-					}
-					else if(tokens[pc].type == "VARIABLE") {
-						//std::cout << variables[tokens[pc]] << std::end;
-						string_to_print = variables[tokens[pc].value].value;
-					}
-					else {
-						std::cerr << "Expected a variable or a number (or a string WIP)" << std::endl;
-						running = false;
-					}
-					pc++;
+					Variable variable = doExpression();
 					if(tokens[pc].type == ")") {
-						std::cout << string_to_print << std::endl;
+						std::cout << variable.value << std::endl;
 						stateMachine.state = StateMachine::IDLE;
 						pc++;
 					}
@@ -179,7 +162,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 }
 
 void Interpreter::interpreter_console() {
-	std::cout << "AJ 0.1.0 Copyright(C) Ahmed Jannadi 2020" << std::endl;
+	std::cout << "AJ 0.2.0 Copyright(C) Ahmed Jannadi 2020" << std::endl;
 	std::string s;
 	while(true) {
 		std::cout << ">" ;
