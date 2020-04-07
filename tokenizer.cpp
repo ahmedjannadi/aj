@@ -8,6 +8,7 @@ Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("true");
 	reserved_tokens.push_back("false");
 	reserved_tokens.push_back("while");
+	reserved_tokens.push_back("if");
 }
 
 bool Tokenizer::checkChar(char c, std::string str) {

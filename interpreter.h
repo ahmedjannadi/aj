@@ -19,6 +19,9 @@ public:
 	void interpreter_console();
 	void changePC(int i);
 	void doStatement();
+	void doWhile();
+	void doIf();
+	void getEndToken();
 
 	Variable getVariable();
 	Variable getExpression();

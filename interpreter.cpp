@@ -7,6 +7,22 @@ void Interpreter::changePC(int i) {
 	pc = i;
 }
 
+void Interpreter::getEndToken() {
+	int end_count = 0;
+	Token token = getToken(pc);
+	while(token.value != "end" || end_count != 0) {
+		if(token.value == "if") {
+			end_count++;
+		}
+		if(token.value == "end") {
+			end_count--;
+		}
+		pc++;
+		token = getToken(pc);
+	}
+}
+
+
 void Interpreter::doStatement() {
 	std::string variable_name;
 	if(tokens[pc].type == "VARIABLE") {
@@ -45,6 +61,81 @@ void Interpreter::doStatement() {
 			running = false;
 		}
 
+	}
+	else if(getToken(pc).value == "while") {
+		doWhile();
+	}
+	else if(getToken(pc).value == "if") {
+		doIf();
+	}
+}
+
+void Interpreter::doWhile() {
+	pc++;
+	if(getToken(pc).value == "(") {
+		pc++;
+		int condition_pc = pc;
+		Variable condition = doExpression();
+		if(getToken(pc).value == ")") {
+				pc++;
+			if(condition.type == Variable::BOOL) {
+				int end_pc = 0;
+				if(condition.value == "true") {
+				while(condition.value == "true") {
+					while(getToken(pc).value != "end") {
+						//std::cout << "Token " << getToken(pc).value << std::endl;
+						doStatement();
+					}
+					end_pc = pc;
+					pc = condition_pc;
+					condition = doExpression();
+					pc++;
+				}
+				}else {
+					getEndToken();
+					end_pc = pc;
+				}
+				pc = end_pc + 1;
+			}
+			 else {
+				std::cout << "expected a boolean in while" << std::endl;
+			}
+		} else {
+			std::cout << "expected ( in while" << std::endl;
+		}
+	}
+}
+
+void Interpreter::doIf() {
+	pc++;
+	if(getToken(pc).value == "(") {
+		pc++;
+		int condition_pc = pc;
+		Variable condition = doExpression();
+		if(getToken(pc).value == ")") {
+				pc++;
+			if(condition.type == Variable::BOOL) {
+				int end_pc = 0;
+				if(condition.value == "true") {
+					while(getToken(pc).value != "end") {
+						doStatement();
+					}
+					end_pc = pc;
+					pc = condition_pc;
+					condition = doExpression();
+					pc++;
+				} else {
+					getEndToken();
+					end_pc = pc;
+				}
+				pc = end_pc + 1;
+			}
+			 else {
+				std::cout << "expected a boolean in if" << std::endl;
+			}
+		} else {
+			std::cout << "expected ( in if" << std::endl;
+		}
 	}
 }
 
@@ -177,13 +268,18 @@ void Interpreter::interpret(std::vector<Token> t) {
 	while(pc < tokens.size() && running) {
 		if(stateMachine.state == StateMachine::IDLE) {
 			if(getToken(pc).type == "VARIABLE") {
-					stateMachine.state = StateMachine::STATEMENT;
+				stateMachine.state = StateMachine::STATEMENT;
 			}
 			else if(getToken(pc).type == "print") {
 				stateMachine.state = StateMachine::PRINT;
 			}
 			else if(getToken(pc).type == "while") {
-				stateMachine.state = StateMachine::WHILE;
+				//stateMachine.state = StateMachine::WHILE;
+				stateMachine.state = StateMachine::STATEMENT;
+			}
+			else if(getToken(pc).type == "if") {
+				//stateMachine.state = StateMachine::IF;
+				stateMachine.state = StateMachine::STATEMENT;
 			}
 			else {
 				std::cerr << "Error on : " << tokens[pc].value << std::endl;
@@ -209,36 +305,14 @@ void Interpreter::interpret(std::vector<Token> t) {
 				std::cout << "Expected after print (" << std::endl;
 				running = false;
 			}
-		} else if(stateMachine.state == StateMachine::WHILE) {
-			pc++;
-			if(getToken(pc).value == "(") {
-				pc++;
-				int condition_pc = pc;
-				Variable condition = doExpression();
-				if(getToken(pc).value == ")") {
-						pc++;
-					if(condition.type == Variable::BOOL) {
-						int end_pc = 0;
-						while(condition.value == "true") {
-							while(getToken(pc).value != "end") {
-								//std::cout << "Token " << getToken(pc).value << std::endl;
-								doStatement();
-							}
-							end_pc = pc;
-							pc = condition_pc;
-							condition = doExpression();
-							pc++;
-						}
-						pc = end_pc + 1;
-					}
-					 else {
-						std::cout << "expected a boolean in while" << std::endl;
-					}
-				} else {
-					std::cout << "expected ( in while" << std::endl;
-				}
-			}
-		} else {
+		}
+//		else if(stateMachine.state == StateMachine::WHILE) {
+//			doWhile();
+//		}
+//		else if(stateMachine.state == StateMachine::IF) {
+//			doIf();
+//		}
+		else {
 			running = false;
 		}
 	}
