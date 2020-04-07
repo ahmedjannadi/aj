@@ -18,15 +18,19 @@ public:
 	void interpret(std::vector<Token> tokens);
 	void interpreter_console();
 	void changePC(int i);
+	void doStatement();
 
 	Variable getVariable();
 	Variable getExpression();
 	Variable doExpression();
 
+	Token getToken(int pc);
+
 	std::string getVariableName();
 	std::string getString();
 
-	Token getToken(int pc);
+	bool isOperator(Token t);
+
 
 	bool running = false;
 	int pc = 0;

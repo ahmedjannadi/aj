@@ -14,5 +14,5 @@ public:
 	bool checkChar(char c,std::string str);
 	bool isLetter(char c);
 	bool isDigit(char c);
-	bool isSymbol(char c);
+	bool isOperator(char c);
 };

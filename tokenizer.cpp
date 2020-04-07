@@ -5,6 +5,9 @@ Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("end");
 	reserved_tokens.push_back("print");
 	reserved_tokens.push_back("type");
+	reserved_tokens.push_back("true");
+	reserved_tokens.push_back("false");
+	reserved_tokens.push_back("while");
 }
 
 bool Tokenizer::checkChar(char c, std::string str) {
@@ -23,8 +26,8 @@ bool Tokenizer::isDigit(char c) {
 	return checkChar(c,"0123456789");
 }
 
-bool Tokenizer::isSymbol(char c) {
-	return checkChar(c,"-+*/%");
+bool Tokenizer::isOperator(char c) {
+	return checkChar(c,"-+*/%><=");
 }
 
 bool Tokenizer::checkReserved(std::string token) {
@@ -45,9 +48,9 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 			type = "VARIABLE";
 		} else if(isDigit(str[i])) {
 			type = "NUMBER";
-		} else if(isSymbol(str[i])) {
+		} else if(isOperator(str[i])) {
 			type = "OPERATOR";
-		} else if(checkChar(str[i],"(){}[]=,;:")) {
+		} else if(checkChar(str[i],"(){}[],;:")) {
 			type = str[i];
 		}else if(checkChar(str[i],"\"\'")){
 				if(!to_string) {
