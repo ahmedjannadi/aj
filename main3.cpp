@@ -6,9 +6,12 @@
 Interpreter interpreter;
 
 int main(int argc, char** argv) {
-	/*std::string test = "a = 5 b=5";
+	/*std::string test = "a = 5 b=5 c = \"hello world\"";
 	auto tokens = interpreter.tokenizer.getTokens(test);
-	interpreter.interpret(tokens);*/
+
+	for(int i=0; i<tokens.size(); i++) {
+		std::cout << tokens[i].type << " : " << tokens[i].value << std::endl;
+	} */
 	
 	if(argc < 2) {
 		interpreter.interpreter_console();

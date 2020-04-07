@@ -4,7 +4,7 @@
 #include"variable.h"
 
 int main(int argc, char** argv) {
-	std::map<std::string, Variable> variables;
+	/*std::map<std::string, Variable> variables;
 	std::vector<Variable> vars;
 	vars.push_back(Variable("hello","hello"));
 
@@ -12,4 +12,5 @@ int main(int argc, char** argv) {
 
 	std::cout << variables["a"].value << std::endl;
 	std::cout << vars[0].value << std::endl;
+	*/
 }

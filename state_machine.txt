@@ -61,3 +61,29 @@ if(token == VARIABLE) {
 	else if token + 1 == --
 		--
 }
+
+
+
+
+
+1+2+3+"4"
+
+(1+(2+3+"4"))
+(2+(3+"4"))
+(3+("4"))
+("4")
+
+//(
+
+
+getExpressions()//
+	token = 1
+	type = number
+	value = 1
+	
+	pc++
+	token = +
+	value = value + getExpression().value // 1+()
+		token = 2
+		value = 2
+	

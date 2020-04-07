@@ -38,6 +38,7 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 	std::string type = "";
 	std::string last_type = "";
 	bool started = false;
+	bool to_string = false;
 	int i = 0;
 	while(i<=str.length()) {
 		if(isLetter(str[i])) {
@@ -46,10 +47,17 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 			type = "NUMBER";
 		} else if(isSymbol(str[i])) {
 			type = "OPERATOR";
-		} else if(checkChar(str[i],"(){}[]=,;:\'\"")) {
+		} else if(checkChar(str[i],"(){}[]=,;:")) {
 			type = str[i];
-		}else {
+		}else if(checkChar(str[i],"\"\'")){
+				to_string = !to_string;
+				type = "STRING";
+		
+		} else {
 			type = "";
+		}
+		if(to_string) {
+			type = "STRING";
 		}
 		if(started) {
 			if(last_type != type || i==str.length()) {

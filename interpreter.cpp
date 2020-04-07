@@ -15,20 +15,63 @@ Token Interpreter::getToken(int pc) {
 	return Token("NULL","NULL");
 }
 
-std::string Interpreter::getVariable() {
-	std::string variable = "";
+Variable Interpreter::getVariable() {
 	if(getToken(pc).type != "VARIABLE") {
 		std::cerr << "Error parsing variable" << std::endl;
 	} else {
-		variable = tokens[pc].value;
+		return variables[getVariableName()];
+	}
+	return Variable(Variable::NIL,"nil");
+}
+
+std::string Interpreter::getVariableName() {
+	std::string variable_name = "";
+	if(getToken(pc).type != "VARIABLE") {
+		std::cerr << "Error parsing variable name" << std::endl;
+	} else {
+		variable_name = tokens[pc].value;
 		pc++;
 	}
+	return variable_name;
+}
+
+Variable Interpreter::getExpression() {
+	Variable variable = Variable(Variable::NIL,"nil");
+	if(getToken(pc).type == "NUMBER") {
+		variable.type = Variable::NUMBER;
+		variable.value = getToken(pc).value;
+		pc++;
+	}else if(getToken(pc).type == "VARIABLE"){
+		variable = getVariable();
+	}else if(getToken(pc).type == "STRING"){
+		variable.type = Variable::STRING;
+		variable.value = getToken(pc).value;
+	}
+	
+	Variable::Type type = variable.type;
+	while(getToken(pc).type == "+") { //
+	//if(getToken(pc).value == "+") {
+		int old_pc = pc;
+		pc++;
+		Variable variable2 = getExpression();
+		if(variable.type == Variable::STRING){ 
+			if(variable2.type != Variable::STRING) {
+				variable.value +=  variable2.value;
+				variable.type = Variable::STRING;
+			}else {
+				
+			}
+		} else {
+			variable.value = std::to_string(std::stoi(variable.value)+std::stoi(variable2.value));
+		}
+	}
+
 	return variable;
 }
 
 void Interpreter::interpret(std::vector<Token> t) {
 	tokens = t;
-	std::string variable = "";
+	std::string variable_name = "";
 
 	pc = 0;
 	running = true;
@@ -49,21 +92,23 @@ void Interpreter::interpret(std::vector<Token> t) {
 			if(tokens[pc].type == "VARIABLE") {
 				//variable = tokens[pc].value;
 				//pc++;
-				variable = getVariable();
+				variable_name = getVariableName();
 				if(tokens[pc].type == "=") {
 					pc++;
-					if(tokens[pc].type == "NUMBER") {
-						variables.insert_or_assign(variable,Variable("NULL",tokens[pc].value));
-						//variables.insert_or_assign(variable,Variable());
-						variable = "";
+					/*if(tokens[pc].type == "NUMBER") {
+						variables.insert_or_assign(variable_name,Variable("number",tokens[pc].value));
+						variable_name = "";
 						stateMachine.state = StateMachine::IDLE;
 						changePC(pc + 1);
-					}
+					}*/
+					variables.insert_or_assign(variable_name,getExpression());
+					variable_name = "";
+					stateMachine.state = StateMachine::IDLE;
+					pc++;
 				} else if (getToken(pc).value == "++") {
-					variable = tokens[pc-1].value;
-					int tmp = std::stoi(variables[variable].value);
-					variables[variable].value = std::to_string(++tmp);
-					variable = "";
+					variable_name = tokens[pc-1].value;
+					int tmp = std::stoi(variables[variable_name].value);
+					variables[variable_name].value = std::to_string(++tmp);
 					stateMachine.state = StateMachine::IDLE;
 					pc++;
 				} else {

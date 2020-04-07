@@ -3,8 +3,11 @@
 
 class Variable {
 public:
+	enum Type {STRING,NUMBER,NIL};
+
 	Variable();
-	Variable(std::string type, std::string value);
-	std::string type;
+	Variable(Type type, std::string value);
+
+	Type type;
 	std::string value;
 };

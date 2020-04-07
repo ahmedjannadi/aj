@@ -19,7 +19,11 @@ public:
 	void interpreter_console();
 	void changePC(int i);
 
-	std::string getVariable();
+	Variable getVariable();
+	Variable getExpression();
+
+	std::string getVariableName();
+	std::string getString();
 
 	Token getToken(int pc);
 
