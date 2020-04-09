@@ -13,6 +13,7 @@ public:
 	StateMachine stateMachine;
 
 	std::vector<Token> tokens;
+	std::map<std::string, int (*)> c_functions;
 	std::map<std::string, Variable> variables;
 
 	void interpret(std::vector<Token> tokens);

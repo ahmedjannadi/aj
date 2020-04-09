@@ -1,7 +1,7 @@
 #include<iostream>
 #include<string>
 
-#include"interpreter.h"
+#include"headers/interpreter.h"
 
 Interpreter interpreter;
 

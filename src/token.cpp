@@ -1,4 +1,4 @@
-#include "token.h"
+#include "headers/token.h"
 
 Token::Token(std::string value, std::string type) {
 	this->value = value;

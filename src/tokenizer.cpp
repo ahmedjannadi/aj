@@ -1,4 +1,4 @@
-#include"tokenizer.h"
+#include"headers/tokenizer.h"
 
 Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("function");
