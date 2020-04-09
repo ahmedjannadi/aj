@@ -22,6 +22,13 @@ int add() {
 	return 0;
 }
 
+int type() {
+	if(interpreter.stack.size() >= 1) {
+		std::string types[] = {"STRING","NUMBER","BOOL","C_FUNCTION","FUNCTION","ARRAY","TABLE","NIL"};
+		std::cout << types[interpreter.stack[0].type] << std::endl;
+	}
+}
+
 int main(int argc, char** argv) {
 	/*std::string test = "a = 5 b=5 c = \"hello world\"";
 	auto tokens = interpreter.tokenizer.getTokens(test);
@@ -31,6 +38,7 @@ int main(int argc, char** argv) {
 	} */
 	interpreter.setC_Function("print",print);
 	interpreter.setC_Function("add",add);
+	interpreter.setC_Function("type",type);
 	if(argc < 2) {
 		interpreter.interpreter_console();
 	} else {

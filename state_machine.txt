@@ -87,3 +87,20 @@ getExpressions()//
 		token = 2
 		value = 2
 	
+
+
+
+function double(x)
+	return x+x
+end
+
+Variable double(Variable::FUNCTION, "NIL")
+double.params["x"]
+double.code = "return x+x"
+
+double(2)
+=====>
+return x+x
+convert
+return 2+2
+

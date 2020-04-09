@@ -62,7 +62,7 @@ void Interpreter::doStatement() {
 					//std::cout << "calling " << variable_name << "()" << std::endl;
 					variables[variable_name].function();
 					stack.clear();
-					pc += 2;
+					pc++;
 				}
 				else {
 				}
@@ -161,9 +161,14 @@ Token Interpreter::getToken(int pc) {
 bool Interpreter::isOperator(Token t) {
 	if (t.value == "+") {
 		return true;
-	} else if (t.value == ">") {
+	}
+	else if (t.value == "==") {
 		return true;
-	} else if (t.value == "<") {
+	}
+	else if (t.value == ">") {
+		return true;
+	}
+	else if (t.value == "<") {
 		return true;
 	}
 
@@ -198,8 +203,23 @@ Variable Interpreter::doExpression() {
 		pc++;
 		if(getToken(pc-1).value == "+") {
 			Variable variable2 = getExpression();
+			if(variable2.type == Variable::STRING) {
+				variable.type = Variable::STRING;
+			}
 			variable.value += variable2.value;
-		} else if(getToken(pc-1).value == ">") {
+		}
+		else if(getToken(pc-1).value == "==") {
+			Variable variable2 = getExpression();
+			if(variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
+				variable.type = Variable::BOOL;
+				if(std::stof(variable.value) == std::stof(variable2.value)) {
+					variable.value = "true";
+				} else {
+					variable.value = "false";
+				}
+			}
+		}
+		else if(getToken(pc-1).value == ">") {
 			Variable variable2 = getExpression();
 			if(variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
 				variable.type = Variable::BOOL;
@@ -209,7 +229,8 @@ Variable Interpreter::doExpression() {
 					variable.value = "false";
 				}
 			}
-		} else if(getToken(pc-1).value == "<") {
+		}
+		else if(getToken(pc-1).value == "<") {
 			Variable variable2 = getExpression();
 			if(variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
 				variable.type = Variable::BOOL;
@@ -219,7 +240,8 @@ Variable Interpreter::doExpression() {
 					variable.value = "false";
 				}
 			}
-		} else {
+		}
+		else {
 			std::cout << getToken(pc).value << std::endl;
 		}
 	}
@@ -327,7 +349,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 }
 
 void Interpreter::interpreter_console() {
-	std::cout << "AJ 0.2.0 Copyright(C) Ahmed Jannadi 2020" << std::endl;
+	std::cout << "AJ 0.3.0 Copyright(C) Ahmed Jannadi 2020" << std::endl;
 	std::string s;
 	while(true) {
 		std::cout << ">" ;
