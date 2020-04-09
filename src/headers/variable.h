@@ -10,4 +10,5 @@ public:
 
 	Type type;
 	std::string value;
+	int (*function)();
 };

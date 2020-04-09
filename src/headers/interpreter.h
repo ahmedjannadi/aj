@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<map>
+#include<stack>
 
 #include"tokenizer.h"
 #include"statemachine.h"
@@ -15,6 +16,7 @@ public:
 	std::vector<Token> tokens;
 	std::map<std::string, int (*)> c_functions;
 	std::map<std::string, Variable> variables;
+	std::vector<Variable> stack;
 
 	void interpret(std::vector<Token> tokens);
 	void interpreter_console();
@@ -23,6 +25,7 @@ public:
 	void doWhile();
 	void doIf();
 	void getEndToken();
+	void setC_Function(std::string name, int (*func)());
 
 	Variable getVariable();
 	Variable getExpression();
