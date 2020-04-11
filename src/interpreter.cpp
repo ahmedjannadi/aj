@@ -132,12 +132,16 @@ void Interpreter::doIf() {
 						doStatement();
 					}
 					end_pc = pc;
-					pc = condition_pc;
-					condition = doExpression();
-					pc++;
 				} else {
 					getEndToken();
 					end_pc = pc;
+					if(getToken(pc+1).value == "else") {
+						pc += 2;
+						while(getToken(pc).value != "end") {
+							doStatement();
+						}
+						end_pc = pc;
+					}
 				}
 				pc = end_pc + 1;
 			}
@@ -168,7 +172,19 @@ bool Interpreter::isOperator(Token t) {
 	else if (t.value == ">") {
 		return true;
 	}
+	else if (t.value == ">=") {
+		return true;
+	}
 	else if (t.value == "<") {
+		return true;
+	}
+	else if (t.value == "<=") {
+		return true;
+	}
+	else if (t.value == "and") {
+		return true;
+	}
+	else if (t.value == "or") {
 		return true;
 	}
 
@@ -230,11 +246,56 @@ Variable Interpreter::doExpression() {
 				}
 			}
 		}
+		else if(getToken(pc-1).value == ">=") {
+			Variable variable2 = getExpression();
+			if(variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
+				variable.type = Variable::BOOL;
+				if(std::stof(variable.value) >= std::stof(variable2.value)) {
+					variable.value = "true";
+				} else {
+					variable.value = "false";
+				}
+			}
+		}
 		else if(getToken(pc-1).value == "<") {
 			Variable variable2 = getExpression();
 			if(variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
 				variable.type = Variable::BOOL;
 				if(std::stof(variable.value) < std::stof(variable2.value)) {
+					variable.value = "true";
+				} else {
+					variable.value = "false";
+				}
+			}
+		}
+		else if(getToken(pc-1).value == "<=") {
+			Variable variable2 = getExpression();
+			if(variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
+				variable.type = Variable::BOOL;
+				if(std::stof(variable.value) <= std::stof(variable2.value)) {
+					variable.value = "true";
+				} else {
+					variable.value = "false";
+				}
+			}
+		}
+		else if(getToken(pc-1).value == "or") {
+			Variable variable2 = getExpression();
+			if(variable2.type == Variable::BOOL && variable.type == Variable::BOOL) {
+				variable.type = Variable::BOOL;
+				if(variable.value == "true" || variable2.value == "true") {
+					variable.value = "true";
+				} else {
+					variable.value = "false";
+				}
+			}
+		}
+
+		else if(getToken(pc-1).value == "and") {
+			Variable variable2 = getExpression();
+			if(variable2.type == Variable::BOOL && variable.type == Variable::BOOL) {
+				variable.type = Variable::BOOL;
+				if(variable.value == "true" && variable2.value == "true") {
 					variable.value = "true";
 				} else {
 					variable.value = "false";
@@ -256,11 +317,23 @@ Variable Interpreter::getExpression() {
 		variable.type = Variable::NUMBER;
 		variable.value = getToken(pc).value;
 		pc++;
-	}else if(getToken(pc).type == "VARIABLE"){
+	}
+	else if(getToken(pc).type == "VARIABLE"){
 		variable = getVariable();
-	}else if(getToken(pc).type == "STRING"){
+	}
+	else if(getToken(pc).type == "STRING"){
 		variable.type = Variable::STRING;
 		variable.value = getToken(pc).value;
+		pc++;
+	}
+	else if(getToken(pc).type == "true"){
+		variable.type = Variable::BOOL;
+		variable.value = "true";
+		pc++;
+	}
+	else if(getToken(pc).type == "false"){
+		variable.type = Variable::BOOL;
+		variable.value = "false";
 		pc++;
 	}
 	

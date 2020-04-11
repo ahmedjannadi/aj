@@ -1,9 +1,15 @@
+#include<fstream>
 #include<iostream>
 #include<map>
 #include<vector>
 #include<stack>
 #include"variable.h"
+//#include"src/headers/tokenizer.h"
 
+
+void read_file(const char* filename) {
+	
+}
 
 std::map<std::string, int (*)()> c_functions;
 std::stack<std::string> st;

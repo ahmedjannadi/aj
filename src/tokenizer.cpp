@@ -9,6 +9,8 @@ Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("false");
 	reserved_tokens.push_back("while");
 	reserved_tokens.push_back("if");
+	reserved_tokens.push_back("or");
+	reserved_tokens.push_back("and");
 }
 
 bool Tokenizer::checkChar(char c, std::string str) {
@@ -28,7 +30,7 @@ bool Tokenizer::isDigit(char c) {
 }
 
 bool Tokenizer::isOperator(char c) {
-	return checkChar(c,"-+*/%><=");
+	return checkChar(c,"-+*/%><=|&");
 }
 
 bool Tokenizer::checkReserved(std::string token) {
