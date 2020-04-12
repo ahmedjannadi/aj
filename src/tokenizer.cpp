@@ -34,7 +34,7 @@ bool Tokenizer::isOperator(char c) {
 }
 
 bool Tokenizer::checkReserved(std::string token) {
-	
+	return false;
 }
 
 std::vector<Token> Tokenizer::getTokens(std::string str) {

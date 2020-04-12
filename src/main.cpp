@@ -27,6 +27,8 @@ int type() {
 		std::string types[] = {"STRING","NUMBER","BOOL","C_FUNCTION","FUNCTION","ARRAY","TABLE","NIL"};
 		std::cout << types[interpreter.stack[0].type] << std::endl;
 	}
+
+	return 0;
 }
 
 int main(int argc, char** argv) {
