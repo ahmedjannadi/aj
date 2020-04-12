@@ -1,5 +1,7 @@
 #pragma once
 #include<string>
+#include<vector>
+#include"token.h"
 
 class Variable {
 public:
@@ -11,4 +13,5 @@ public:
 	Type type;
 	std::string value;
 	int (*function)();
+	std::vector<Token> function_body;
 };

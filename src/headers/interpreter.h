@@ -30,6 +30,7 @@ public:
 	Variable getVariable();
 	Variable getExpression();
 	Variable doExpression();
+	Variable doFunctionToken();
 
 	Token getToken(int pc);
 

@@ -7,6 +7,35 @@ void Interpreter::changePC(int i) {
 	pc = i;
 }
 
+Variable Interpreter::doFunctionToken() {
+		Variable function = Variable(Variable::FUNCTION,"NIL");
+		std::string function_name;
+		if(getToken(pc).type == "function") {
+			pc++;
+			if(getToken(pc).type == "VARIABLE") {
+				function_name = getToken(pc).value;
+				pc++;
+				if(getToken(pc).type == "(") {
+					pc++;
+					if(getToken(pc).type == ")") {
+						pc++;
+						int before_end = pc;
+						getEndToken();
+						int end_pc = pc;
+						pc = before_end;
+						while(pc != end_pc) {
+							function.function_body.push_back(getToken(pc));
+							pc++;
+						}
+						pc++;
+					}
+				}
+			}
+		}
+		variables.insert_or_assign(function_name,function);
+		return function;
+}
+
 void Interpreter::getEndToken() {
 	int end_count = 0;
 	Token token = getToken(pc);
@@ -46,6 +75,7 @@ void Interpreter::doStatement() {
 			pc++;
 		}
 		else if (getToken(pc).value == "(") {
+			int function_call_pc = pc-1;
 			pc++;
 			if(getToken(pc).value != ")") {
 				stack.push_back(doExpression());
@@ -54,18 +84,31 @@ void Interpreter::doStatement() {
 					stack.push_back(doExpression());
 				}
 			}
-			if(variables[variable_name].type != Variable::C_FUNCTION) {
-				std::cout << "error: " << variable_name << " is not a function" << std::endl;
-				stateMachine.state = StateMachine::IDLE;
-			}else {
+			if(variables[variable_name].type == Variable::C_FUNCTION) {
 				if(getToken(pc).value == ")") {
 					//std::cout << "calling " << variable_name << "()" << std::endl;
 					variables[variable_name].function();
 					stack.clear();
 					pc++;
 				}
-				else {
+			}
+			else if(variables[variable_name].type == Variable::FUNCTION) {
+				if(getToken(pc).value == ")") {
+					int function_call_end = pc;
+					auto it = tokens.begin();
+					//for(int i=function_call_pc; i<function_call_end; i++) {
+						tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
+					//}
+					//it = tokens.begin();
+					for(int i=variables[variable_name].function_body.size()-1;i>=0;i--) {
+						tokens.insert(it+function_call_pc,variables[variable_name].function_body[i]);
+					}
+					pc=function_call_pc;
 				}
+			}
+			else {
+				std::cout << "error: " << variable_name << " is not a function" << std::endl;
+				stateMachine.state = StateMachine::IDLE;
 			}
 		}
 		else {
@@ -78,6 +121,9 @@ void Interpreter::doStatement() {
 	}
 	else if(getToken(pc).value == "if") {
 		doIf();
+	}
+	else if(getToken(pc).value == "function") {
+		doFunctionToken();
 	}
 }
 
@@ -381,6 +427,10 @@ void Interpreter::interpret(std::vector<Token> t) {
 				stateMachine.state = StateMachine::STATEMENT;
 			}
 			else if(getToken(pc).type == "if") {
+				//stateMachine.state = StateMachine::IF;
+				stateMachine.state = StateMachine::STATEMENT;
+			}
+			else if(getToken(pc).type == "function") {
 				//stateMachine.state = StateMachine::IF;
 				stateMachine.state = StateMachine::STATEMENT;
 			}
