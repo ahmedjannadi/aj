@@ -43,6 +43,12 @@ void Interpreter::getEndToken() {
 		if(token.value == "if") {
 			end_count++;
 		}
+		if(token.value == "while") {
+			end_count++;
+		}
+		if(token.value == "function") {
+			end_count++;
+		}
 		if(token.value == "end") {
 			end_count--;
 		}
@@ -70,7 +76,14 @@ void Interpreter::doStatement() {
 		} else if (getToken(pc).value == "++") {
 			variable_name = tokens[pc-1].value;
 			float tmp = std::stof(variables[variable_name].value);
-			variables[variable_name].value = std::to_string(++tmp);
+			std::string tmp_string = std::to_string(++tmp);
+			// TODO trim ends
+			//int last_place = tmp_string.length();
+			//while(tmp_string[last_place] == '.' || tmp_string[last_place] == '0') {
+			//	last_place--;
+			//}
+			//tmp_string = tmp_string.substr(0,last_place);
+			variables[variable_name].value = tmp_string;
 			stateMachine.state = StateMachine::IDLE;
 			pc++;
 		}
@@ -96,9 +109,10 @@ void Interpreter::doStatement() {
 				if(getToken(pc).value == ")") {
 					int function_call_end = pc;
 					auto it = tokens.begin();
-					//for(int i=function_call_pc; i<function_call_end; i++) {
-						tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
-					//}
+					for(int i=function_call_pc; i<function_call_end+1; i++) {
+						//tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
+						tokens.erase(tokens.begin()+function_call_pc);
+					}
 					//it = tokens.begin();
 					for(int i=variables[variable_name].function_body.size()-1;i>=0;i--) {
 						tokens.insert(it+function_call_pc,variables[variable_name].function_body[i]);
@@ -408,6 +422,19 @@ Variable Interpreter::getExpression() {
 
 
 	return variable;
+}
+
+void Interpreter::interpret_function(Variable function){
+	int old_pc = pc;
+	std::vector<Token> old_tokens = tokens;
+
+	pc = 0;
+	tokens = function.function_body;
+	
+	// do stuff
+	
+	pc = old_pc;
+	tokens = old_tokens;
 }
 
 void Interpreter::interpret(std::vector<Token> t) {

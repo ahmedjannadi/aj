@@ -19,6 +19,7 @@ public:
 	std::vector<Variable> stack;
 
 	void interpret(std::vector<Token> tokens);
+	void interpret_function(Variable function);
 	void interpreter_console();
 	void changePC(int i);
 	void doStatement();
