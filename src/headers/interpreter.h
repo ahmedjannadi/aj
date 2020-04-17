@@ -19,7 +19,7 @@ public:
 	std::vector<Variable> stack;
 	int stack_pointer = 0;
 
-	void printTokens(); // for debugging
+	void printTokens(std::vector<Token> tokens); // for debugging
 
 	void interpret(std::vector<Token> tokens);
 	void interpret_function(Variable function);

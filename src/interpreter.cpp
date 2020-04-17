@@ -7,7 +7,7 @@ void Interpreter::changePC(int i) {
 	pc = i;
 }
 
-void Interpreter::printTokens() {
+void Interpreter::printTokens(std::vector<Token> tokens) {
 	for(int i=0; i<tokens.size(); i++) {
 		std::cout << tokens[i].value << std::endl;
 	}
@@ -283,6 +283,9 @@ bool Interpreter::isOperator(Token t) {
 	if (t.value == "+") {
 		return true;
 	}
+	else if (t.value == "-") {
+		return true;
+	}
 	else if (t.value == "==") {
 		return true;
 	}
@@ -340,6 +343,16 @@ Variable Interpreter::doExpression() {
 				variable.type = Variable::STRING;
 			}
 			variable.value += variable2.value;
+		}
+		else if(getToken(pc-1).value == "-") {
+			Variable variable2 = getExpression();
+			if((variable.type == Variable::NUMBER || variable.type == Variable::NIL) && variable2.type == Variable::NUMBER) {
+				if(variable.type == Variable::NIL) {
+					variable.value = "0";
+				}
+				variable.type = Variable::NUMBER;
+				variable.value = std::to_string(std::stof(variable.value)-std::stof(variable2.value));
+			}
 		}
 		else if(getToken(pc-1).value == "==") {
 			Variable variable2 = getExpression();
@@ -564,9 +577,9 @@ void Interpreter::interpreter_console() {
 	std::cout << "AJ 0.3.0 Copyright(C) Ahmed Jannadi 2020" << std::endl;
 	std::string s;
 	while(true) {
-		std::cout << ">" ;
+		std::cout << "> " ;
 		std::getline(std::cin, s);
+		//printTokens(tokenizer.getTokens(s));
 		interpret(tokenizer.getTokens(s));
-		//printTokens();
 	}
 }

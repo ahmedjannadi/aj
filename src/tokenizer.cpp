@@ -61,12 +61,12 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 //			type = "";
 //			continue;
 		} else if(isOperator(str[i])) {
-			if(type=="" && str[i] == '-') {
-				type = "NUMBER";
-			}
-			else {
+		//	if(type=="" && str[i] == '-' && i < str.length()-1 && isDigit(str[i+1])) {
+		//		type = "NUMBER";
+		//	}
+		//	else {
 				type = "OPERATOR";
-			}
+		//	}
 		} else if(checkChar(str[i],"(){}[],;:.")) {
 			if(type == "NUMBER"){
 				if(str[i] != '.'){
@@ -90,7 +90,7 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 					type = "";
 				}
 				to_string = !to_string;
-		} else {
+		} else if(str[i] == ' ') {
 			type = "";
 		}
 		if(to_string) {

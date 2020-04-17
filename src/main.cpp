@@ -16,8 +16,8 @@ int aj_sleep() {
 }
 
 int print() {
-	if(aj.interpreter.stack.size() >= aj.interpreter.stack_pointer ) {
-		std::cout << aj.interpreter.stack[aj.interpreter.stack_pointer].value << std::endl;
+	if(aj.interpreter.stack.size() > 0 ) {
+		std::cout << aj.interpreter.stack[0].value << std::endl;
 	}
 	return 0;
 }
@@ -33,7 +33,7 @@ int add() {
 }
 
 int type() {
-	if(aj.interpreter.stack.size() >= 1) {
+	if(aj.interpreter.stack.size() > 0) {
 		std::string types[] = {"STRING","NUMBER","BOOL","C_FUNCTION","FUNCTION","ARRAY","TABLE","NIL"};
 		std::cout << types[aj.interpreter.stack[0].type] << std::endl;
 	}
