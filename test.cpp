@@ -3,7 +3,7 @@
 #include<map>
 #include<vector>
 #include<stack>
-#include"variable.h"
+//#include"variable.h"
 //#include"src/headers/tokenizer.h"
 
 
@@ -33,9 +33,9 @@ signed int test() {
 
 int main(int argc, char** argv) {
 
-	aj_c_function("test",test);
-	st.push("10");
-	aj_do_function("test");
+	//aj_c_function("test",test);
+	//st.push("10");
+	//aj_do_function("test");
 
 	/*std::map<std::string, Variable> variables;
 	std::vector<Variable> vars;
@@ -46,4 +46,11 @@ int main(int argc, char** argv) {
 	std::cout << variables["a"].value << std::endl;
 	std::cout << vars[0].value << std::endl;
 	*/
+
+	std::vector<int> stack;
+	stack.push_back(20);
+	stack.push_back(10);
+	stack.push_back(40);
+
+	std::cout << stack.pop() << std::endl;
 }

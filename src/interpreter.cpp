@@ -7,6 +7,46 @@ void Interpreter::changePC(int i) {
 	pc = i;
 }
 
+void Interpreter::printTokens() {
+	for(int i=0; i<tokens.size(); i++) {
+		std::cout << tokens[i].value << std::endl;
+	}
+}
+
+Variable Interpreter::doFunction(std::string function_name) {
+	Variable variable = Variable(Variable::NIL, "nil");
+	int function_call_pc = pc;
+	if(getToken(pc+1).value == "(" && getToken(pc+2).value == ")") {
+		pc+=2;
+		int function_call_end = pc;
+		auto it = tokens.begin();
+		for(int i=function_call_pc; i<function_call_end+1; i++) {
+			//tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
+			tokens.erase(tokens.begin()+function_call_pc);
+		}
+		//it = tokens.begin();
+		for(int i=variables[function_name].function_body.size()-1;i>=0;i--) {
+			tokens.insert(it+function_call_pc,variables[function_name].function_body[i]);
+		}
+
+		//printTokens();
+
+		pc=function_call_pc;
+		int end_pc = function_call_pc+variables[function_name].function_body.size();
+		while(pc != end_pc) {
+			if(getToken(pc).value == "return") {
+				pc++;
+				Variable v = doExpression();
+				pc = end_pc;
+				return v;
+			}
+			doStatement();
+		}
+
+	}
+		return variable;
+}
+
 Variable Interpreter::doFunctionToken() {
 		Variable function = Variable(Variable::FUNCTION,"NIL");
 		std::string function_name;
@@ -36,11 +76,14 @@ Variable Interpreter::doFunctionToken() {
 		return function;
 }
 
-void Interpreter::getEndToken() {
+bool Interpreter::getEndToken() {
 	int end_count = 0;
 	Token token = getToken(pc);
-	while(token.value != "end" || end_count != 0) {
+	while((token.value != "end" || end_count != 0) && pc < tokens.size() ) {
 		if(token.value == "if") {
+			end_count++;
+		}
+		if(token.value == "else") {
 			end_count++;
 		}
 		if(token.value == "while") {
@@ -55,6 +98,7 @@ void Interpreter::getEndToken() {
 		pc++;
 		token = getToken(pc);
 	}
+	return getToken(pc).value == "end";
 }
 
 void Interpreter::setC_Function(std::string name, int (*func)()) {
@@ -73,7 +117,8 @@ void Interpreter::doStatement() {
 			variables.insert_or_assign(variable_name,doExpression());
 			variable_name = "";
 			stateMachine.state = StateMachine::IDLE;
-		} else if (getToken(pc).value == "++") {
+		}
+		else if (getToken(pc).value == "++") {
 			variable_name = tokens[pc-1].value;
 			float tmp = std::stof(variables[variable_name].value);
 			std::string tmp_string = std::to_string(++tmp);
@@ -83,6 +128,14 @@ void Interpreter::doStatement() {
 			//	last_place--;
 			//}
 			//tmp_string = tmp_string.substr(0,last_place);
+			variables[variable_name].value = tmp_string;
+			stateMachine.state = StateMachine::IDLE;
+			pc++;
+		}
+		else if (getToken(pc).value == "--") {
+			variable_name = tokens[pc-1].value;
+			float tmp = std::stof(variables[variable_name].value);
+			std::string tmp_string = std::to_string(--tmp);
 			variables[variable_name].value = tmp_string;
 			stateMachine.state = StateMachine::IDLE;
 			pc++;
@@ -100,14 +153,16 @@ void Interpreter::doStatement() {
 			if(variables[variable_name].type == Variable::C_FUNCTION) {
 				if(getToken(pc).value == ")") {
 					//std::cout << "calling " << variable_name << "()" << std::endl;
+
 					variables[variable_name].function();
 					stack.clear();
+					//stack.erase(stack.begin()+stack_pointer, stack.end());
 					pc++;
 				}
 			}
 			else if(variables[variable_name].type == Variable::FUNCTION) {
 				if(getToken(pc).value == ")") {
-					int function_call_end = pc;
+					/*int function_call_end = pc;
 					auto it = tokens.begin();
 					for(int i=function_call_pc; i<function_call_end+1; i++) {
 						//tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
@@ -117,7 +172,9 @@ void Interpreter::doStatement() {
 					for(int i=variables[variable_name].function_body.size()-1;i>=0;i--) {
 						tokens.insert(it+function_call_pc,variables[variable_name].function_body[i]);
 					}
-					pc=function_call_pc;
+					pc=function_call_pc;*/
+					pc = function_call_pc;
+					doFunction(variable_name);
 				}
 			}
 			else {
@@ -379,7 +436,12 @@ Variable Interpreter::getExpression() {
 		pc++;
 	}
 	else if(getToken(pc).type == "VARIABLE"){
-		variable = getVariable();
+		if(getToken(pc+1).type != "("){
+			variable = getVariable();
+		} else {
+			std::string function_name = getToken(pc).value;
+			variable = doFunction(function_name);
+		}
 	}
 	else if(getToken(pc).type == "STRING"){
 		variable.type = Variable::STRING;
@@ -505,8 +567,6 @@ void Interpreter::interpreter_console() {
 		std::cout << ">" ;
 		std::getline(std::cin, s);
 		interpret(tokenizer.getTokens(s));
-		//for(int i=0; i<tokens.size(); i++) {
-		//	std::cout << tokens[i].type << " : " << tokens[i].value << std::endl;
-		//}
+		//printTokens();
 	}
 }

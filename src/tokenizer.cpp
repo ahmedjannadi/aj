@@ -11,6 +11,7 @@ Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("if");
 	reserved_tokens.push_back("or");
 	reserved_tokens.push_back("and");
+	reserved_tokens.push_back("return");
 }
 
 bool Tokenizer::checkChar(char c, std::string str) {
@@ -60,7 +61,12 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 //			type = "";
 //			continue;
 		} else if(isOperator(str[i])) {
-			type = "OPERATOR";
+			if(type=="" && str[i] == '-') {
+				type = "NUMBER";
+			}
+			else {
+				type = "OPERATOR";
+			}
 		} else if(checkChar(str[i],"(){}[],;:.")) {
 			if(type == "NUMBER"){
 				if(str[i] != '.'){
@@ -68,7 +74,13 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 				}
 			}
 			else {		
-				type = str[i];
+				if(type == std::string(1,str[i])) {
+					tokens.push_back(Token(std::string(1,str[i]),std::string(1,str[i])));
+					i++;
+				}
+				else {
+					type = str[i];
+				}
 			}
 		}else if(checkChar(str[i],"\"\'")){
 				if(!to_string) {

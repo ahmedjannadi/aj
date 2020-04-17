@@ -1,21 +1,31 @@
 #include<iostream>
 #include<string>
+#include <unistd.h>
 
-#include"headers/interpreter.h"
+//#include"headers/interpreter.h"
+#include"headers/aj.h"
 
-Interpreter interpreter;
+//Interpreter interpreter;
+Aj aj;
+
+int aj_sleep() {
+	if(aj.interpreter.stack.size() > 0 ) {
+		sleep(std::stoi(aj.interpreter.stack[0].value));
+	}
+	return 0;
+}
 
 int print() {
-	if(interpreter.stack.size() >0 ) {
-		std::cout << interpreter.stack[0].value << std::endl;
+	if(aj.interpreter.stack.size() >= aj.interpreter.stack_pointer ) {
+		std::cout << aj.interpreter.stack[aj.interpreter.stack_pointer].value << std::endl;
 	}
 	return 0;
 }
 
 int add() {
-	if(interpreter.stack.size() >= 2 ) {
-		float a = std::stof(interpreter.stack[0].value);
-		float b = std::stof(interpreter.stack[1].value);
+	if(aj.interpreter.stack.size() >= 2 ) {
+		float a = std::stof(aj.interpreter.stack[0].value);
+		float b = std::stof(aj.interpreter.stack[1].value);
 		std::cout << a+b << std::endl;
 	}
 
@@ -23,9 +33,9 @@ int add() {
 }
 
 int type() {
-	if(interpreter.stack.size() >= 1) {
+	if(aj.interpreter.stack.size() >= 1) {
 		std::string types[] = {"STRING","NUMBER","BOOL","C_FUNCTION","FUNCTION","ARRAY","TABLE","NIL"};
-		std::cout << types[interpreter.stack[0].type] << std::endl;
+		std::cout << types[aj.interpreter.stack[0].type] << std::endl;
 	}
 
 	return 0;
@@ -38,18 +48,24 @@ int main(int argc, char** argv) {
 	for(int i=0; i<tokens.size(); i++) {
 		std::cout << tokens[i].type << " : " << tokens[i].value << std::endl;
 	} */
-	interpreter.setC_Function("print",print);
-	interpreter.setC_Function("add",add);
-	interpreter.setC_Function("type",type);
+	aj.interpreter.setC_Function("print",print);
+	aj.interpreter.setC_Function("add",add);
+	aj.interpreter.setC_Function("type",type);
+	aj.interpreter.setC_Function("sleep",aj_sleep);
 	if(argc < 2) {
-		interpreter.interpreter_console();
-	} else {
+		aj.interpreter.interpreter_console();
+	}
+	else if (argc == 3){
 		std::string arg1 = argv[1];
 		std::string arg2 = argv[2];
 		if(arg1.compare("-i") == 0) {
-			auto tokens = interpreter.tokenizer.getTokens(arg2);
-			interpreter.interpret(tokens);
+			auto tokens = aj.interpreter.tokenizer.getTokens(arg2);
+			aj.interpreter.interpret(tokens);
 		}
+	}
+	else if (argc == 2) {
+		std::string arg = argv[1];
+		aj.doFile(arg);
 	}
 
 	return 0;

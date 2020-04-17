@@ -17,6 +17,9 @@ public:
 	std::map<std::string, int (*)> c_functions;
 	std::map<std::string, Variable> variables;
 	std::vector<Variable> stack;
+	int stack_pointer = 0;
+
+	void printTokens(); // for debugging
 
 	void interpret(std::vector<Token> tokens);
 	void interpret_function(Variable function);
@@ -25,13 +28,14 @@ public:
 	void doStatement();
 	void doWhile();
 	void doIf();
-	void getEndToken();
+	bool getEndToken();
 	void setC_Function(std::string name, int (*func)());
 
 	Variable getVariable();
 	Variable getExpression();
 	Variable doExpression();
 	Variable doFunctionToken();
+	Variable doFunction(std::string funciton_name);
 
 	Token getToken(int pc);
 
