@@ -17,6 +17,9 @@ public:
 	std::map<std::string, int (*)> c_functions;
 	std::map<std::string, Variable> variables;
 	std::vector<Variable> stack;
+
+	std::stack<std::vector<Token>> tokens_stack;
+	std::stack<int> pc_stack;
 	int stack_pointer = 0;
 
 	void printTokens(std::vector<Token> tokens); // for debugging

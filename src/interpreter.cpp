@@ -15,6 +15,34 @@ void Interpreter::printTokens(std::vector<Token> tokens) {
 
 Variable Interpreter::doFunction(std::string function_name) {
 	Variable variable = Variable(Variable::NIL, "nil");
+	if(getToken(pc+1).value == "(" && getToken(pc+2).value == ")") {
+		pc+=2;
+		tokens_stack.push(tokens);
+		pc_stack.push(pc);
+		tokens = variables[function_name].function_body;
+		pc = 0;
+
+		while(pc < tokens.size()) {
+			if(getToken(pc).value == "return") {
+				pc++;
+				variable = doExpression();
+				break;
+			}
+			doStatement();
+		}
+
+		pc = pc_stack.top();
+		tokens = tokens_stack.top();
+		pc_stack.pop();
+		tokens_stack.pop();
+		
+		pc++;
+	}
+		return variable;
+}
+
+/*Variable Interpreter::doFunction(std::string function_name) {
+	Variable variable = Variable(Variable::NIL, "nil");
 	int function_call_pc = pc;
 	if(getToken(pc+1).value == "(" && getToken(pc+2).value == ")") {
 		pc+=2;
@@ -45,7 +73,7 @@ Variable Interpreter::doFunction(std::string function_name) {
 
 	}
 		return variable;
-}
+}*/
 
 Variable Interpreter::doFunctionToken() {
 		Variable function = Variable(Variable::FUNCTION,"NIL");
@@ -275,7 +303,6 @@ Token Interpreter::getToken(int pc) {
 	if(pc>=0 && pc < tokens.size()) {
 		return tokens[pc];
 	}
-
 	return Token("NULL","NULL");
 }
 
