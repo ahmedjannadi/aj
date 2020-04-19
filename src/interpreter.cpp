@@ -203,7 +203,7 @@ void Interpreter::doStatement() {
 			}
 		}
 		else {
-			std::cerr << "wrong syntax -> " + tokens[pc-1].value + " " + tokens[pc].value << std::endl;
+			std::cout << "wrong syntax -> " + tokens[pc-1].value + " " + tokens[pc].value << std::endl;
 			running = false;
 		}
 	}
@@ -262,25 +262,34 @@ void Interpreter::doIf() {
 		Variable condition = doExpression();
 		if(getToken(pc).value == ")") {
 				pc++;
+				int start_pc = pc;
+				getEndToken();
+				int end_if_pc = pc;
+				pc = start_pc;
+
 			if(condition.type == Variable::BOOL) {
-				int end_pc = 0;
 				if(condition.value == "true") {
-					while(getToken(pc).value != "end") {
+					while(pc<end_if_pc) {
 						doStatement();
 					}
-					end_pc = pc;
+					if(getToken(pc+1).value == "else") {
+						pc++;
+						getEndToken();
+					}
 				} else {
-					getEndToken();
-					end_pc = pc;
+					pc = end_if_pc;
 					if(getToken(pc+1).value == "else") {
 						pc += 2;
-						while(getToken(pc).value != "end") {
+						int start_else_pc = pc;
+						getEndToken();
+						int end_else_pc = pc;
+						pc = start_else_pc;
+						while(pc<end_else_pc) {
 							doStatement();
 						}
-						end_pc = pc;
 					}
 				}
-				pc = end_pc + 1;
+				pc++; 
 			}
 			 else {
 				std::cout << "expected a boolean in if" << std::endl;
@@ -332,7 +341,7 @@ bool Interpreter::isOperator(Token t) {
 
 Variable Interpreter::getVariable() {
 	if(getToken(pc).type != "VARIABLE") {
-		std::cerr << "Error parsing variable" << std::endl;
+		std::cout << "Error parsing variable" << std::endl;
 	} else {
 		std::string variable_name = getVariableName();
 		for(int i=function_stack_pointer-1; i>=0 ; i--) {
@@ -359,7 +368,7 @@ Variable Interpreter::getVariable() {
 std::string Interpreter::getVariableName() {
 	std::string variable_name = "";
 	if(getToken(pc).type != "VARIABLE") {
-		std::cerr << "Error parsing variable name" << std::endl;
+		std::cout << "Error parsing variable name" << std::endl;
 	} else {
 		variable_name = tokens[pc].value;
 		pc++;
@@ -573,7 +582,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 				stateMachine.state = StateMachine::STATEMENT;
 			}
 			else {
-				std::cerr << "Error on : " << tokens[pc].value << std::endl;
+				std::cout << "Error on : " << tokens[pc].value << std::endl;
 				running = false;
 			}
 		} else if(stateMachine.state == StateMachine::STATEMENT) {
@@ -589,7 +598,7 @@ void Interpreter::interpret(std::vector<Token> t) {
 						pc++;
 					}
 					else {
-						std::cerr << "Expected ) after print" << std::endl;
+						std::cout << "Expected ) after print" << std::endl;
 						running = false;
 					}
 			}else {

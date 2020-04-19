@@ -11,3 +11,7 @@ assert(a == "10\n")
 command = "\'a = 10 if(a<3) print(a) end else print(3000) end\'"
 a = os.popen("./aj -i "+command).read()
 assert(a == "3000\n")
+
+command = "\'a = 10 if(a<30) print(a) end else print(3000) end\'"
+a = os.popen("./aj -i "+command).read()
+assert(a == "10\n")
