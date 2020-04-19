@@ -48,6 +48,6 @@ command = "'function test() return 1 end print(test())'"
 a = os.popen("./aj -i " + command).read()
 assert(a == "1\n")
 
-#command = "'function test() function hello() print(2) end hello() end test()'"
-#a = os.popen("./aj -i " + command).read()
-#assert(a == "2\n")
+command = "'function test() function hello() print(2) end hello() end test()'"
+a = os.popen("./aj -i " + command).read()
+assert(a == "2\n")

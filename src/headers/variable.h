@@ -12,6 +12,12 @@ public:
 
 	Type type;
 	std::string value;
+
+	// for C_FUNCTION
 	int (*function)();
+
+	// for FUNCTION
 	std::vector<Token> function_body;
+	std::vector<std::string> function_variable_names;
+	std::vector<Variable> function_variables;
 };

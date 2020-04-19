@@ -13,67 +13,73 @@ void Interpreter::printTokens(std::vector<Token> tokens) {
 	}
 }
 
-Variable Interpreter::doFunction(std::string function_name) {
-	Variable variable = Variable(Variable::NIL, "nil");
-	if(getToken(pc+1).value == "(" && getToken(pc+2).value == ")") {
-		pc+=2;
-		tokens_stack.push(tokens);
-		pc_stack.push(pc);
-		tokens = variables[function_name].function_body;
-		pc = 0;
+void Interpreter::setVariable(std::string name, Variable v) {
+	
+}
 
-		while(pc < tokens.size()) {
-			if(getToken(pc).value == "return") {
-				pc++;
-				variable = doExpression();
-				break;
-			}
-			doStatement();
+Variable Interpreter::doC_Function(std::string function_name) {
+	Variable variable = Variable(Variable::NIL, "nil");
+	if(getToken(pc+1).value == "(") {
+		pc+=2;
+		
+		while(getToken(pc).value != ")") {
+				stack.push_back(doExpression());
+				if(getToken(pc).value == ",") {
+					pc++;
+				}
 		}
 
-		pc = pc_stack.top();
-		tokens = tokens_stack.top();
-		pc_stack.pop();
-		tokens_stack.pop();
-		
-		pc++;
+		if(getToken(pc).value == ")") {
+			variables[function_name].function();
+			stack.clear();
+			pc++;
+		}
 	}
 		return variable;
 }
 
-/*Variable Interpreter::doFunction(std::string function_name) {
+Variable Interpreter::doFunction(std::string function_name) {
 	Variable variable = Variable(Variable::NIL, "nil");
-	int function_call_pc = pc;
-	if(getToken(pc+1).value == "(" && getToken(pc+2).value == ")") {
+	if(getToken(pc+1).value == "(") {
 		pc+=2;
-		int function_call_end = pc;
-		auto it = tokens.begin();
-		for(int i=function_call_pc; i<function_call_end+1; i++) {
-			//tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
-			tokens.erase(tokens.begin()+function_call_pc);
-		}
-		//it = tokens.begin();
-		for(int i=variables[function_name].function_body.size()-1;i>=0;i--) {
-			tokens.insert(it+function_call_pc,variables[function_name].function_body[i]);
+		
+		int tmp = 0;
+		while(getToken(pc).value != ")") {
+				variables[function_name].function_variables.push_back(doExpression());
+				if(getToken(pc).value == ",") {
+					pc++;
+				}
 		}
 
-		//printTokens();
-
-		pc=function_call_pc;
-		int end_pc = function_call_pc+variables[function_name].function_body.size();
-		while(pc != end_pc) {
-			if(getToken(pc).value == "return") {
-				pc++;
-				Variable v = doExpression();
-				pc = end_pc;
-				return v;
+		if(getToken(pc).value == ")") {
+			tokens_stack.push(tokens);
+			pc_stack.push(pc);
+			tokens = variables[function_name].function_body;
+			pc = 0;
+			function_stack.push_back(function_name);
+			function_stack_pointer++;
+	
+			while(pc < tokens.size()) {
+				if(getToken(pc).value == "return") {
+					pc++;
+					variable = doExpression();
+					break;
+				}
+				doStatement();
 			}
-			doStatement();
+	
+			pc = pc_stack.top();
+			tokens = tokens_stack.top();
+			pc_stack.pop();
+			tokens_stack.pop();
+			function_stack.pop_back();
+			function_stack_pointer--;
+				
+			pc++;
 		}
-
 	}
 		return variable;
-}*/
+}
 
 Variable Interpreter::doFunctionToken() {
 		Variable function = Variable(Variable::FUNCTION,"NIL");
@@ -85,6 +91,17 @@ Variable Interpreter::doFunctionToken() {
 				pc++;
 				if(getToken(pc).type == "(") {
 					pc++;
+					// TODO fetch params
+					while(getToken(pc).type != ")") {
+						if(getToken(pc).type == "VARIABLE") {
+							function.function_variable_names.push_back(getToken(pc).value);
+							pc++;
+						}
+						if(getToken(pc).value == ",") {
+							pc++;
+						}
+					}
+
 					if(getToken(pc).type == ")") {
 						pc++;
 						int before_end = pc;
@@ -100,6 +117,10 @@ Variable Interpreter::doFunctionToken() {
 				}
 			}
 		}
+
+		//function.function_variable_names.push_back("ahmed");
+		//function.function_variables.push_back(Variable(Variable::NUMBER, "12"));
+
 		variables.insert_or_assign(function_name,function);
 		return function;
 }
@@ -169,41 +190,12 @@ void Interpreter::doStatement() {
 			pc++;
 		}
 		else if (getToken(pc).value == "(") {
-			int function_call_pc = pc-1;
-			pc++;
-			if(getToken(pc).value != ")") {
-				stack.push_back(doExpression());
-				while(getToken(pc).value == ",") {
-					pc++;
-					stack.push_back(doExpression());
-				}
-			}
+			pc--;
 			if(variables[variable_name].type == Variable::C_FUNCTION) {
-				if(getToken(pc).value == ")") {
-					//std::cout << "calling " << variable_name << "()" << std::endl;
-
-					variables[variable_name].function();
-					stack.clear();
-					//stack.erase(stack.begin()+stack_pointer, stack.end());
-					pc++;
-				}
+				doC_Function(variable_name);
 			}
 			else if(variables[variable_name].type == Variable::FUNCTION) {
-				if(getToken(pc).value == ")") {
-					/*int function_call_end = pc;
-					auto it = tokens.begin();
-					for(int i=function_call_pc; i<function_call_end+1; i++) {
-						//tokens.erase(tokens.begin()+function_call_pc,tokens.begin()+(function_call_end-function_call_pc)+1);
-						tokens.erase(tokens.begin()+function_call_pc);
-					}
-					//it = tokens.begin();
-					for(int i=variables[variable_name].function_body.size()-1;i>=0;i--) {
-						tokens.insert(it+function_call_pc,variables[variable_name].function_body[i]);
-					}
-					pc=function_call_pc;*/
-					pc = function_call_pc;
 					doFunction(variable_name);
-				}
 			}
 			else {
 				std::cout << "error: " << variable_name << " is not a function" << std::endl;
@@ -342,10 +334,27 @@ Variable Interpreter::getVariable() {
 	if(getToken(pc).type != "VARIABLE") {
 		std::cerr << "Error parsing variable" << std::endl;
 	} else {
-		return variables[getVariableName()];
+		std::string variable_name = getVariableName();
+		for(int i=function_stack_pointer-1; i>=0 ; i--) {
+			Variable function = variables[function_stack[i]];
+			auto tmp = std::find(function.function_variable_names.begin(), function.function_variable_names.end(),variable_name);
+			if(tmp != function.function_variable_names.end()) {
+				return function.function_variables.at(std::distance(function.function_variable_names.begin(), tmp));
+			}
+		}
+		return variables[variable_name];
 	}
 	return Variable(Variable::NIL,"nil");
 }
+
+/*Variable Interpreter::getVariable() {
+	if(getToken(pc).type != "VARIABLE") {
+		std::cerr << "Error parsing variable" << std::endl;
+	} else {
+		return variables[getVariableName()];
+	}
+	return Variable(Variable::NIL,"nil");
+}*/
 
 std::string Interpreter::getVariableName() {
 	std::string variable_name = "";

@@ -2,6 +2,7 @@
 #include<iostream>
 #include<map>
 #include<stack>
+#include<algorithm>
 
 #include"tokenizer.h"
 #include"statemachine.h"
@@ -22,6 +23,9 @@ public:
 	std::stack<int> pc_stack;
 	int stack_pointer = 0;
 
+	std::vector<std::string> function_stack;
+	int function_stack_pointer = 0;
+
 	void printTokens(std::vector<Token> tokens); // for debugging
 
 	void interpret(std::vector<Token> tokens);
@@ -33,12 +37,14 @@ public:
 	void doIf();
 	bool getEndToken();
 	void setC_Function(std::string name, int (*func)());
+	void setVariable(std::string name, Variable v);
 
 	Variable getVariable();
 	Variable getExpression();
 	Variable doExpression();
 	Variable doFunctionToken();
 	Variable doFunction(std::string funciton_name);
+	Variable doC_Function(std::string funciton_name);
 
 	Token getToken(int pc);
 
