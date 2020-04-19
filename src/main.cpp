@@ -22,23 +22,36 @@ int print() {
 	return 0;
 }
 
+int input() {
+	if(aj.interpreter.stack.size() > 0 ) {
+		std::cout << aj.interpreter.stack[0].value << std::endl;
+	}
+	std::string s;
+	std::getline(std::cin,s);
+	Variable v = Variable(Variable::STRING, s);
+	aj.interpreter.stack.push_back(v);
+	return 1;
+}
+
 int add() {
 	if(aj.interpreter.stack.size() >= 2 ) {
 		float a = std::stof(aj.interpreter.stack[0].value);
 		float b = std::stof(aj.interpreter.stack[1].value);
-		std::cout << a+b << std::endl;
+		aj.interpreter.stack.push_back(Variable(Variable::NUMBER,std::to_string(a+b)));
 	}
 
-	return 0;
+	return 1;
 }
 
 int type() {
 	if(aj.interpreter.stack.size() > 0) {
 		std::string types[] = {"STRING","NUMBER","BOOL","C_FUNCTION","FUNCTION","ARRAY","TABLE","NIL"};
-		std::cout << types[aj.interpreter.stack[0].type] << std::endl;
+		Variable v = Variable(Variable::STRING,types[aj.interpreter.stack[0].type]);
+		aj.interpreter.stack.push_back(v);
+		//std::cout << types[aj.interpreter.stack[0].type] << std::endl;
 	}
 
-	return 0;
+	return 1;
 }
 
 int main(int argc, char** argv) {
@@ -49,6 +62,7 @@ int main(int argc, char** argv) {
 		std::cout << tokens[i].type << " : " << tokens[i].value << std::endl;
 	} */
 	aj.interpreter.setC_Function("print",print);
+	aj.interpreter.setC_Function("input",input);
 	aj.interpreter.setC_Function("add",add);
 	aj.interpreter.setC_Function("type",type);
 	aj.interpreter.setC_Function("sleep",aj_sleep);

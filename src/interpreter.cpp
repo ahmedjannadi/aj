@@ -30,7 +30,9 @@ Variable Interpreter::doC_Function(std::string function_name) {
 		}
 
 		if(getToken(pc).value == ")") {
-			variables[function_name].function();
+			if(variables[function_name].function() == 1) {
+				variable = stack[stack.size()-1];
+			}
 			stack.clear();
 			pc++;
 		}
@@ -43,7 +45,6 @@ Variable Interpreter::doFunction(std::string function_name) {
 	if(getToken(pc+1).value == "(") {
 		pc+=2;
 		
-		int tmp = 0;
 		while(getToken(pc).value != ")") {
 				variables[function_name].function_variables.push_back(doExpression());
 				if(getToken(pc).value == ",") {
@@ -65,8 +66,18 @@ Variable Interpreter::doFunction(std::string function_name) {
 					variable = doExpression();
 					break;
 				}
+
+				if(getToken(pc).value == "if") {
+					Variable tmp = doIfFunction();
+					if(tmp.type != Variable::NIL) {
+						variable = tmp;
+						break;
+					}
+				}
 				doStatement();
 			}
+
+			variables[function_name].function_variables.clear(); // clear params
 	
 			pc = pc_stack.top();
 			tokens = tokens_stack.top();
@@ -74,6 +85,7 @@ Variable Interpreter::doFunction(std::string function_name) {
 			tokens_stack.pop();
 			function_stack.pop_back();
 			function_stack_pointer--;
+			
 				
 			pc++;
 		}
@@ -203,6 +215,7 @@ void Interpreter::doStatement() {
 			}
 		}
 		else {
+			//std::cout << variables[variable_name].value << std::endl;
 			std::cout << "wrong syntax -> " + tokens[pc-1].value + " " + tokens[pc].value << std::endl;
 			running = false;
 		}
@@ -270,6 +283,7 @@ void Interpreter::doIf() {
 			if(condition.type == Variable::BOOL) {
 				if(condition.value == "true") {
 					while(pc<end_if_pc) {
+						// check return statement
 						doStatement();
 					}
 					if(getToken(pc+1).value == "else") {
@@ -285,6 +299,7 @@ void Interpreter::doIf() {
 						int end_else_pc = pc;
 						pc = start_else_pc;
 						while(pc<end_else_pc) {
+							// check return statement
 							doStatement();
 						}
 					}
@@ -300,6 +315,64 @@ void Interpreter::doIf() {
 	}
 }
 
+Variable Interpreter::doIfFunction() {
+	pc++;
+	if(getToken(pc).value == "(") {
+		pc++;
+		int condition_pc = pc;
+		Variable condition = doExpression();
+		if(getToken(pc).value == ")") {
+				pc++;
+				int start_pc = pc;
+				getEndToken();
+				int end_if_pc = pc;
+				pc = start_pc;
+
+			if(condition.type == Variable::BOOL) {
+				if(condition.value == "true") {
+					while(pc<end_if_pc) {
+						// check return statement
+						if(getToken(pc).value == "return") {
+							pc++;
+							return doExpression();
+						}
+						doStatement();
+					}
+					if(getToken(pc+1).value == "else") {
+						pc++;
+						getEndToken();
+					}
+				} else {
+					pc = end_if_pc;
+					if(getToken(pc+1).value == "else") {
+						pc += 2;
+						int start_else_pc = pc;
+						getEndToken();
+						int end_else_pc = pc;
+						pc = start_else_pc;
+						while(pc<end_else_pc) {
+							// check return statement
+							if(getToken(pc).value == "return") {
+								pc++;
+								return doExpression();
+							}
+							doStatement();
+						}
+					}
+				}
+				pc++; 
+			}
+			 else {
+				std::cout << "expected a boolean in if" << std::endl;
+			}
+		} else {
+			std::cout << "expected ( in if" << std::endl;
+		}
+	}
+
+	return Variable(Variable::NIL,"NIL");
+}
+
 Token Interpreter::getToken(int pc) {
 	if(pc>=0 && pc < tokens.size()) {
 		return tokens[pc];
@@ -312,6 +385,12 @@ bool Interpreter::isOperator(Token t) {
 		return true;
 	}
 	else if (t.value == "-") {
+		return true;
+	}
+	else if (t.value == "*") {
+		return true;
+	}
+	else if (t.value == "/") {
 		return true;
 	}
 	else if (t.value == "==") {
@@ -397,6 +476,26 @@ Variable Interpreter::doExpression() {
 				}
 				variable.type = Variable::NUMBER;
 				variable.value = std::to_string(std::stof(variable.value)-std::stof(variable2.value));
+			}
+		}
+		else if(getToken(pc-1).value == "*") {
+			Variable variable2 = getExpression();
+			if((variable.type == Variable::NUMBER || variable.type == Variable::NIL) && variable2.type == Variable::NUMBER) {
+				if(variable.type == Variable::NIL) {
+					variable.value = "0";
+				}
+				variable.type = Variable::NUMBER;
+				variable.value = std::to_string(std::stof(variable.value)*std::stof(variable2.value));
+			}
+		}
+		else if(getToken(pc-1).value == "/") {
+			Variable variable2 = getExpression();
+			if((variable.type == Variable::NUMBER || variable.type == Variable::NIL) && variable2.type == Variable::NUMBER) {
+				if(variable.type == Variable::NIL) {
+					variable.value = "0";
+				}
+				variable.type = Variable::NUMBER;
+				variable.value = std::to_string(std::stof(variable.value)/std::stof(variable2.value));
 			}
 		}
 		else if(getToken(pc-1).value == "==") {
@@ -498,7 +597,12 @@ Variable Interpreter::getExpression() {
 			variable = getVariable();
 		} else {
 			std::string function_name = getToken(pc).value;
-			variable = doFunction(function_name);
+			if(variables[function_name].type == Variable::FUNCTION) {
+				variable = doFunction(function_name);
+			}
+			else {
+				variable = doC_Function(function_name);
+			}
 		}
 	}
 	else if(getToken(pc).type == "STRING"){
@@ -587,24 +691,6 @@ void Interpreter::interpret(std::vector<Token> t) {
 			}
 		} else if(stateMachine.state == StateMachine::STATEMENT) {
 			doStatement();
-		} else if(stateMachine.state == StateMachine::PRINT) {
-			changePC(pc + 1);
-			if(tokens[pc].type == "(") {
-					pc++;
-					Variable variable = doExpression();
-					if(tokens[pc].type == ")") {
-						std::cout << variable.value << std::endl;
-						stateMachine.state = StateMachine::IDLE;
-						pc++;
-					}
-					else {
-						std::cout << "Expected ) after print" << std::endl;
-						running = false;
-					}
-			}else {
-				std::cout << "Expected after print (" << std::endl;
-				running = false;
-			}
 		}
 //		else if(stateMachine.state == StateMachine::WHILE) {
 //			doWhile();

@@ -14,7 +14,9 @@ void Aj::doFile(std::string filename) {
 	std::ifstream file(filename);
 	if(file.is_open()){
 		while(getline(file,line)) {
-			file_content += line+" ";
+			if(line[0] != '#') {
+				file_content += line+" ";
+			}
 		}
 	}
 	file.close();

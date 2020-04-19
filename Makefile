@@ -1,2 +1,2 @@
 a:
-	g++ -std=c++17 -g src/*.cpp -o aj
+	g++ -std=c++17 src/*.cpp -o aj

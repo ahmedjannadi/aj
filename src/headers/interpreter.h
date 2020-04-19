@@ -35,6 +35,7 @@ public:
 	void doStatement();
 	void doWhile();
 	void doIf();
+	Variable doIfFunction();
 	bool getEndToken();
 	void setC_Function(std::string name, int (*func)());
 	void setVariable(std::string name, Variable v);
