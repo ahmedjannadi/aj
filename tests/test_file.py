@@ -1,4 +1,4 @@
 import os
 
-a = os.popen("./aj test.aj").read()
-assert(a == "3\n")
+a = os.popen("./aj tests/file.aj").read()
+assert(a=="3\n")

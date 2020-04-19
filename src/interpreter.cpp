@@ -426,8 +426,14 @@ Variable Interpreter::getVariable() {
 		for(int i=function_stack_pointer-1; i>=0 ; i--) {
 			Variable function = variables[function_stack[i]];
 			auto tmp = std::find(function.function_variable_names.begin(), function.function_variable_names.end(),variable_name);
+			int tmp2 = 0;
+			for(int j=0; j<function_stack.size(); j++) {
+				if (function_stack[i] == function_stack[j]) {
+					tmp2++;
+				}
+			}
 			if(tmp != function.function_variable_names.end()) {
-				return function.function_variables.at(std::distance(function.function_variable_names.begin(), tmp));
+				return function.function_variables.at(((tmp2-1)*function.function_variable_names.size())+std::distance(function.function_variable_names.begin(), tmp));
 			}
 		}
 		return variables[variable_name];
