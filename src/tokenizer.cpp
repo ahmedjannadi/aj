@@ -80,6 +80,7 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 						tokens.push_back(Token(std::string(1,str[i]),std::string(1,str[i])));
 						i++;
 					}
+					i--;
 					type="";
 				}
 				else {
