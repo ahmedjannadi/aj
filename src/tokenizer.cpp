@@ -52,7 +52,12 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 		if(isLetter(str[i])) {
 			type = "VARIABLE";
 		} else if(isDigit(str[i])) {
-			type = "NUMBER";
+			if(type == "VARIABLE") {
+				type = "VARIABLE";
+			}
+			else {
+				type = "NUMBER";
+			}
 //			std::string c_t; // current token
 //			while(isDigit(str[i]) || checkChar(str[i],".")) {
 //				c_t = c_t+str[i];
