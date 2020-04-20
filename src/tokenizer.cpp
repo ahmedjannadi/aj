@@ -1,4 +1,5 @@
 #include"headers/tokenizer.h"
+#include<iostream>
 
 Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("function");
@@ -75,8 +76,11 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 			}
 			else {		
 				if(type == std::string(1,str[i])) {
-					tokens.push_back(Token(std::string(1,str[i]),std::string(1,str[i])));
-					i++;
+					while(type == std::string(1,str[i])) {
+						tokens.push_back(Token(std::string(1,str[i]),std::string(1,str[i])));
+						i++;
+					}
+					type="";
 				}
 				else {
 					type = str[i];
@@ -90,7 +94,10 @@ std::vector<Token> Tokenizer::getTokens(std::string str) {
 					type = "";
 				}
 				to_string = !to_string;
-		} else if(str[i] == ' ') {
+		} else if(str[i] == '_') {
+			type = "VARIABLE";
+		}
+		else if(str[i] == ' ') {
 			type = "";
 		}
 		if(to_string) {

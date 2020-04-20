@@ -15,4 +15,5 @@ public:
 	bool isLetter(char c);
 	bool isDigit(char c);
 	bool isOperator(char c);
+	bool isSingleToken(std::string str);
 };

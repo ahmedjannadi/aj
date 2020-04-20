@@ -13,8 +13,82 @@ void Interpreter::printTokens(std::vector<Token> tokens) {
 	}
 }
 
-void Interpreter::setVariable(std::string name, Variable v) {
-	
+void Interpreter::setInteger(std::string name, int v) {
+	variables[name] = Variable(Variable::NUMBER,std::to_string(v));
+}
+
+void Interpreter::setFloat(std::string name, float v) {
+	variables[name] = Variable(Variable::NUMBER,std::to_string(v));
+}
+
+void Interpreter::setString(std::string name, std::string v) {
+	variables[name] = Variable(Variable::STRING,v);
+}
+
+void Interpreter::setBool(std::string name, bool v) {
+	std::string v_bool;
+	if(v) {
+		v_bool = "true";
+	}else {
+		v_bool = "false";
+	}
+	variables[name] = Variable(Variable::BOOL,v_bool);
+}
+
+int Interpreter::getInteger(std::string name) {
+	return std::stoi(variables[name].value);
+}
+
+float Interpreter::getFloat(std::string name) {
+	return std::stof(variables[name].value);
+}
+
+bool Interpreter::getBool(std::string name) {
+	return variables[name].value == "true";
+}
+
+std::string Interpreter::getString(std::string name) {
+	return variables[name].value;
+}
+
+
+int Interpreter::getStackInteger(int i) {
+	return std::stoi(stack[i].value);
+}
+
+float Interpreter::getStackFloat(int i) {
+	return std::stof(stack[i].value);
+}
+
+std::string Interpreter::getStackString(int i) {
+	return stack[i].value;
+}
+
+bool Interpreter::getStackBool(int i) {
+	return stack[i].value == "true";
+}
+
+void Interpreter::pushStackInteger(int v) {
+	stack.push_back(Variable(Variable::NUMBER,std::to_string(v)));
+}
+
+void Interpreter::pushStackFloat(float v) {
+	stack.push_back(Variable(Variable::NUMBER,std::to_string(v)));
+}
+
+void Interpreter::pushStackString(std::string v) {
+	stack.push_back(Variable(Variable::STRING,v));
+}
+
+void Interpreter::pushStackBool(bool v) {
+	std::string v_bool;
+	if(v) {
+		v_bool = "true";
+	}
+	else {
+		v_bool = "false";
+	}
+	stack.push_back(Variable(Variable::BOOL,v_bool));
 }
 
 Variable Interpreter::doC_Function(std::string function_name) {
@@ -310,8 +384,11 @@ void Interpreter::doIf() {
 				std::cout << "expected a boolean in if" << std::endl;
 			}
 		} else {
-			std::cout << "expected ( in if" << std::endl;
+			std::cout << "expected ) in if" << std::endl;
 		}
+	} 
+	else {
+			std::cout << "expected ( in if" << std::endl;
 	}
 }
 

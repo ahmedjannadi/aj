@@ -38,7 +38,26 @@ public:
 	Variable doIfFunction();
 	bool getEndToken();
 	void setC_Function(std::string name, int (*func)());
-	void setVariable(std::string name, Variable v);
+
+	void setInteger(std::string name, int v);
+	void setFloat(std::string name, float v);
+	void setBool(std::string name, bool v);
+	void setString(std::string name, std::string v);
+
+	int getInteger(std::string name);
+	float getFloat(std::string name);
+	bool getBool(std::string name);
+	std::string getString(std::string name);
+
+	std::string getStackString(int i);
+	int getStackInteger(int i);
+	float getStackFloat(int i);
+	bool getStackBool(int i);
+
+	void pushStackString(std::string v);
+	void pushStackInteger(int v);
+	void pushStackFloat(float v);
+	void pushStackBool(bool v);
 
 	Variable getVariable();
 	Variable getExpression();
