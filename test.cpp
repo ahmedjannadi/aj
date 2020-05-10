@@ -1,17 +1,10 @@
-#include<fstream>
-#include<iostream>
-#include<map>
-#include<vector>
-#include<stack>
-//#include"variable.h"
-#include<iostream>
-#include"src/headers/tokenizer.h"
-
+#include <iostream>
+#include "test2.h"
+#include "src/headers/aj.h"
 
 int main(int argc, char** argv) {
-	Tokenizer t;
-	auto tokens = t.getTokens("print(type(test())) end");
-	for(int i=0; i< tokens.size(); i++) {
-		std::cout << tokens[i].value << std::endl;
-	}
+	Aj aj;
+	TEST2_init(&aj);
+
+	aj.doCommand("test");
 }

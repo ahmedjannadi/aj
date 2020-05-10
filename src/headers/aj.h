@@ -12,9 +12,4 @@ public:
 	int getInteger(std::string variable);
 	int getFloat(std::string variable);
 	int getString(std::string variable);
-
-	int aj_sleep();
-	int aj_print();
-	int aj_type();
-	int aj_add();
 };

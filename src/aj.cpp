@@ -1,8 +1,11 @@
 #include<fstream>
+#include<unistd.h>
 #include "headers/aj.h"
 
 Aj::Aj() {
+	//Aj::interpreter = new Interpreter();
 }
+
 
 void Aj::doCommand(std::string command) {
 	interpreter.interpret(interpreter.tokenizer.getTokens(command));
@@ -22,5 +25,3 @@ void Aj::doFile(std::string filename) {
 	file.close();
 	interpreter.interpret(interpreter.tokenizer.getTokens(file_content));
 }
-
-

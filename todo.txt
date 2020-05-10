@@ -1,2 +1,0 @@
-Tokenizer:
-	()))a print(3) >> ( ) ) ) print ( 3 ) << "a" is missing because tokenizer skips it

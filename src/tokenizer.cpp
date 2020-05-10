@@ -12,6 +12,7 @@ Tokenizer::Tokenizer() {
 	reserved_tokens.push_back("if");
 	reserved_tokens.push_back("or");
 	reserved_tokens.push_back("and");
+	reserved_tokens.push_back("not");
 	reserved_tokens.push_back("return");
 }
 

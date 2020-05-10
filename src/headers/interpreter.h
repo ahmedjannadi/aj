@@ -15,7 +15,7 @@ public:
 	StateMachine stateMachine;
 
 	std::vector<Token> tokens;
-	std::map<std::string, int (*)> c_functions;
+	std::map<std::string, int (*)(Interpreter*)> c_functions;
 	std::map<std::string, Variable> variables;
 	std::vector<Variable> stack;
 
@@ -72,7 +72,6 @@ public:
 	std::string getString();
 
 	bool isOperator(Token t);
-
 
 	bool running = false;
 	int pc = 0;
