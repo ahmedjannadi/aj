@@ -23,7 +23,7 @@ public:
 	std::stack<int> pc_stack;
 	int stack_pointer = 0;
 
-	std::vector<std::string> function_stack;
+	std::vector<Variable> function_stack;
 	int function_stack_pointer = 0;
 
 	void printTokens(std::vector<Token> tokens); // for debugging

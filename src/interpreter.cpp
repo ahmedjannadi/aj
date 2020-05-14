@@ -116,24 +116,26 @@ Variable Interpreter::doC_Function(std::string function_name) {
 }
 
 Variable Interpreter::doFunction(std::string function_name) {
+	Variable function;
 	Variable variable = Variable(Variable::NIL, "nil");
 	if(getToken(pc+1).value == "(") {
 		pc+=2;
+		function = variables[function_name];
 		
 		while(getToken(pc).value != ")") {
-				variables[function_name].function_variables.push_back(doExpression());
+				function.function_variables.push_back(doExpression());
 				if(getToken(pc).value == ",") {
 					pc++;
 				}
 		}
 
 		if(getToken(pc).value == ")") {
-			if(variables[function_name].type == Variable::FUNCTION) {
-			tokens_stack.push(tokens);
+			if(function.type == Variable::FUNCTION) {
+				tokens_stack.push(tokens);
 				pc_stack.push(pc);
-				tokens = variables[function_name].function_body;
+				tokens = function.function_body;
 				pc = 0;
-				function_stack.push_back(function_name);
+				function_stack.push_back(function);
 				function_stack_pointer++;
 		
 				while(pc < tokens.size()) {
@@ -153,7 +155,7 @@ Variable Interpreter::doFunction(std::string function_name) {
 					doStatement();
 				}
 	
-				variables[function_name].function_variables.clear(); // clear params
+				function.function_variables.clear(); // clear params
 		
 				pc = pc_stack.top();
 				tokens = tokens_stack.top();
@@ -504,7 +506,7 @@ bool Interpreter::isOperator(Token t) {
 	return false;
 }
 
-Variable Interpreter::getVariable() {
+/*Variable Interpreter::getVariable() {
 	if(getToken(pc).type != "VARIABLE") {
 		std::cout << "Error parsing variable" << std::endl;
 	} else {
@@ -522,6 +524,21 @@ Variable Interpreter::getVariable() {
 				return function.function_variables.at(((tmp2-1)*function.function_variable_names.size())+std::distance(function.function_variable_names.begin(), tmp));
 			}
 		}
+		return variables[variable_name];
+	}
+	return Variable(Variable::NIL,"nil");
+}*/
+
+Variable Interpreter::getVariable() {
+	if(getToken(pc).type != "VARIABLE") {
+		std::cerr << "Error parsing variable" << std::endl;
+	} else {
+			std::string variable_name = getVariableName();
+			for(int i=function_stack_pointer-1; i>=0; i--) {
+				Variable function = function_stack[i];
+				auto tmp = std::find(function.function_variable_names.begin(), function.function_variable_names.end(), variable_name);
+				return function.function_variables.at(std::distance(function.function_variable_names.begin(),tmp));
+			}
 		return variables[variable_name];
 	}
 	return Variable(Variable::NIL,"nil");
