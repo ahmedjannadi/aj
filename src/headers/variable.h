@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<vector>
+#include<map>
 #include"token.h"
 
 class Variable {
@@ -20,4 +21,8 @@ public:
 	std::vector<Token> function_body;
 	std::vector<std::string> function_variable_names;
 	std::vector<Variable> function_variables;
+	std::map<std::string, Variable> function_params;
+
+	// for ARRAY
+	std::vector<Variable> array_values;
 };

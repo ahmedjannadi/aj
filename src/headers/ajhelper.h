@@ -12,3 +12,4 @@ int input();
 int type();
 int sleep2();
 int add();
+int len();

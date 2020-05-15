@@ -122,8 +122,13 @@ Variable Interpreter::doFunction(std::string function_name) {
 		pc+=2;
 		function = variables[function_name];
 		
+		int function_variable_name_index = 0;
+
 		while(getToken(pc).value != ")") {
-				function.function_variables.push_back(doExpression());
+				//function.function_variables.push_back(doExpression());
+				function.function_params[function.function_variable_names[function_variable_name_index]]=doExpression();
+				function_variable_name_index++;
+
 				if(getToken(pc).value == ",") {
 					pc++;
 				}
@@ -253,6 +258,19 @@ void Interpreter::doStatement() {
 	int start_pc = pc;
 	if(getToken(pc).type == "VARIABLE") {
 		variable_name = getVariableName();
+
+		// TODO Array
+
+		//Variable *var;
+		/*if(variables[variable_name].type == Variable::Array) {
+			if(getToken(pc).value == "[") {
+				pc++;
+				if(getToken(pc).value == "]") {
+					
+				}
+			}
+		}*/
+
 		if(getToken(pc).value == "=") {
 			pc++;
 			variables.insert_or_assign(variable_name,doExpression());
@@ -536,13 +554,28 @@ Variable Interpreter::getVariable() {
 			std::string variable_name = getVariableName();
 			for(int i=function_stack_pointer-1; i>=0; i--) {
 				Variable function = function_stack[i];
+				if (function.function_params.find(variable_name) != function.function_params.end())
+					return function.function_params[variable_name];
+			}
+		return variables[variable_name];
+	}
+	return Variable(Variable::NIL,"nil");
+}
+
+/*Variable Interpreter::getVariable() {
+	if(getToken(pc).type != "VARIABLE") {
+		std::cerr << "Error parsing variable" << std::endl;
+	} else {
+			std::string variable_name = getVariableName();
+			for(int i=function_stack_pointer-1; i>=0; i--) {
+				Variable function = function_stack[i];
 				auto tmp = std::find(function.function_variable_names.begin(), function.function_variable_names.end(), variable_name);
 				return function.function_variables.at(std::distance(function.function_variable_names.begin(),tmp));
 			}
 		return variables[variable_name];
 	}
 	return Variable(Variable::NIL,"nil");
-}
+}*/
 
 /*Variable Interpreter::getVariable() {
 	if(getToken(pc).type != "VARIABLE") {
@@ -702,9 +735,7 @@ Variable Interpreter::getExpression() {
 		pc++;
 	}
 	else if(getToken(pc).type == "VARIABLE"){
-		if(getToken(pc+1).type != "("){
-			variable = getVariable();
-		} else {
+		if(getToken(pc+1).type == "("){
 			std::string function_name = getToken(pc).value;
 			if(variables[function_name].type == Variable::FUNCTION) {
 				variable = doFunction(function_name);
@@ -712,6 +743,18 @@ Variable Interpreter::getExpression() {
 			else {
 				variable = doC_Function(function_name);
 			}
+		}
+		else if(getToken(pc+1).type == "[") {
+			Variable array = variables[getToken(pc).value];
+			pc += 2;
+			Variable index = doExpression();
+			if(getToken(pc).type == "]") {
+				variable = array.array_values[std::stoi(index.value)];
+				pc++;
+			}
+		}
+		else {
+			variable = getVariable();
 		}
 	}
 	else if(getToken(pc).type == "STRING"){
@@ -737,6 +780,25 @@ Variable Interpreter::getExpression() {
 				variable.value = "false";
 			}else {
 				variable.value = "true";
+			}
+		}
+	}
+	else if(getToken(pc).value == "[") {
+		pc++;
+		if(getToken(pc).value == "]") {
+			variable.type = Variable::ARRAY;
+			variable.value = "test";
+			pc++;
+		} else {
+			variable.array_values.push_back(doExpression());
+			while(getToken(pc).value == ",") {
+				pc++;
+				variable.array_values.push_back(doExpression());
+			}
+			if(getToken(pc).value == "]") {
+				variable.type = Variable::ARRAY;
+				variable.value = std::to_string(variable.array_values.size());
+				pc++;
 			}
 		}
 	}

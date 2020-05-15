@@ -1,4 +1,4 @@
-a = 0
+a = 1
 #simple comment test print("hello")
 
 function draw_cube(x,y)

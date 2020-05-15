@@ -12,6 +12,7 @@ void AJ_Helper_Init(Aj* aj2) {
 	aj_helper->interpreter.setC_Function("input", input);
 	aj_helper->interpreter.setC_Function("type", type);
 	aj_helper->interpreter.setC_Function("add", add);
+	aj_helper->interpreter.setC_Function("len", len);
 }
 
 int test() {
@@ -23,6 +24,17 @@ int print() {
 		std::cout << aj_helper->interpreter.stack[0].value << std::endl;
 	}
 	return 0;
+}
+int len() {
+	if(aj_helper->interpreter.stack.size() > 0 ) {
+		if(aj_helper->interpreter.stack[0].type == Variable::ARRAY) {
+			aj_helper->interpreter.stack.push_back(Variable(Variable::NUMBER,std::to_string(aj_helper->interpreter.stack[0].array_values.size())));
+		}
+		else if(aj_helper->interpreter.stack[0].type == Variable::STRING) {
+			aj_helper->interpreter.stack.push_back(Variable(Variable::NUMBER,std::to_string(aj_helper->interpreter.stack[0].value.length())));
+		}
+	}
+	return 1;
 }
 
 int sleep2() {
