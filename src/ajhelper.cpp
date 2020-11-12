@@ -1,5 +1,5 @@
 #include "headers/ajhelper.h"
-#include<iostream>
+#include <iostream>
 #include <unistd.h>
 
 Aj* aj_helper = NULL;
@@ -17,6 +17,7 @@ void AJ_Helper_Init(Aj* aj2) {
 
 int test() {
 	std::cout << "hello world" << std::endl;
+	return 0;
 }
 
 int print() {
