@@ -1,6 +1,10 @@
 #include "headers/ajhelper.h"
 #include <iostream>
-#include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+#elif
+#include<unistd.h>
+#endif
 
 Aj* aj_helper = NULL;
 
@@ -40,7 +44,12 @@ int len() {
 
 int sleep2() {
 	if(aj_helper->interpreter.stack.size() > 0 ) {
+#ifdef _WIN32
+		Sleep(std::stoi(aj_helper->interpreter.stack[0].value));
+#elif
 		sleep(std::stoi(aj_helper->interpreter.stack[0].value));
+#endif
+		
 	}
 	return 0;
 }
