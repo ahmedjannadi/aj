@@ -409,8 +409,35 @@ void Interpreter::doIf() {
 				}
 				pc++; 
 			}
-			 else {
-				std::cout << "expected a boolean in if" << std::endl;
+			else if (condition.type == Variable::STRING) {
+				if (condition.value == "true") {
+					while (pc < end_if_pc) {
+						// check return statement
+						doStatement();
+					}
+					if (getToken(pc + 1).value == "else") {
+						pc++;
+						getEndToken();
+					}
+				}
+				else {
+					pc = end_if_pc;
+					if (getToken(pc + 1).value == "else") {
+						pc += 2;
+						int start_else_pc = pc;
+						getEndToken();
+						int end_else_pc = pc;
+						pc = start_else_pc;
+						while (pc < end_else_pc) {
+							// check return statement
+							doStatement();
+						}
+					}
+				}
+				pc++;
+			}
+			else {
+				std::cout << "expected a boolean or string in if" << std::endl;
 			}
 		} else {
 			std::cout << "expected ) in if" << std::endl;
@@ -497,6 +524,9 @@ bool Interpreter::isOperator(Token t) {
 		return true;
 	}
 	else if (t.value == "/") {
+		return true;
+	}
+	else if (t.value == "!=") {
 		return true;
 	}
 	else if (t.value == "==") {
@@ -650,6 +680,36 @@ Variable Interpreter::doExpression() {
 					variable.value = "false";
 				}
 			}
+			else if (variable2.type == Variable::STRING && variable.type == Variable::STRING) {
+				variable.type = Variable::BOOL;
+				if (variable.value == variable2.value) {
+					variable.value = "true";
+				}
+				else {
+					variable.value = "false";
+				}
+			}
+		}
+		else if (getToken(pc - 1).value == "!=") {
+			Variable variable2 = getExpression();
+			if (variable2.type == Variable::NUMBER && variable.type == Variable::NUMBER) {
+				variable.type = Variable::BOOL;
+				if (std::stof(variable.value) == std::stof(variable2.value)) {
+					variable.value = "false";
+				}
+				else {
+					variable.value = "true";
+				}
+			}
+			else if (variable2.type == Variable::STRING && variable.type == Variable::STRING) {
+				variable.type = Variable::BOOL;
+				if (variable.value == variable2.value) {
+					variable.value = "false";
+				}
+				else {
+					variable.value = "true";
+				}
+			}
 		}
 		else if(getToken(pc-1).value == ">") {
 			Variable variable2 = getExpression();
@@ -749,8 +809,16 @@ Variable Interpreter::getExpression() {
 			pc += 2;
 			Variable index = doExpression();
 			if(getToken(pc).type == "]") {
-				variable = array.array_values[std::stoi(index.value)];
-				pc++;
+				try
+				{
+					variable = array.array_values[std::stoi(index.value)];
+					pc++;
+				}
+				catch (const std::exception&)
+				{
+					std::cout << "Error on : " << getToken(pc-2).value<< getToken(pc-1).value << getToken(pc).value << std::endl;
+					exit(0);
+				}	
 			}
 		}
 		else {
