@@ -1,3 +1,5 @@
 /aj
 /a.out
 /build/*
+/x64/*
+/.vs/*
