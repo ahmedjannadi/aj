@@ -1,4 +1,4 @@
-#include "headers/coreHelper.h"
+#include "headers/ajHelper.h"
 #include <iostream>
 #ifdef _WIN32
 #include <windows.h>
@@ -17,7 +17,7 @@ void AJ_Helper_Init(Aj* aj2) {
 	aj_helper->interpreter.setC_Function("type", type);
 	aj_helper->interpreter.setC_Function("add", add);
 	aj_helper->interpreter.setC_Function("len", len);
-	core_helper->interpreter.setC_Function("append", append);
+	aj_helper->interpreter.setC_Function("append", append);
 }
 
 int test() {
@@ -90,7 +90,7 @@ int type() {
 int append() {
 	if (aj_helper->interpreter.stack.size() >= 2) {
 		if (aj_helper->interpreter.stack[0].type == Variable::ARRAY) {
-			Variable elemToAdd = Variable(core_helper->interpreter.stack[1].type, aj_helper->interpreter.stack[1].value);
+			Variable elemToAdd = Variable(aj_helper->interpreter.stack[1].type, aj_helper->interpreter.stack[1].value);
 			Variable tmpArray = aj_helper->interpreter.stack[0];
 			tmpArray.array_values.push_back(elemToAdd);
 
