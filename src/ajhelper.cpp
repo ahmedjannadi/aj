@@ -1,6 +1,10 @@
-#include "headers/ajhelper.h"
+#include "headers/ajHelper.h"
 #include <iostream>
-#include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+#elif
+#include<unistd.h>
+#endif
 
 Aj* aj_helper = NULL;
 
@@ -13,6 +17,7 @@ void AJ_Helper_Init(Aj* aj2) {
 	aj_helper->interpreter.setC_Function("type", type);
 	aj_helper->interpreter.setC_Function("add", add);
 	aj_helper->interpreter.setC_Function("len", len);
+	aj_helper->interpreter.setC_Function("append", append);
 }
 
 int test() {
@@ -40,7 +45,12 @@ int len() {
 
 int sleep2() {
 	if(aj_helper->interpreter.stack.size() > 0 ) {
+#ifdef _WIN32
+		Sleep(std::stoi(aj_helper->interpreter.stack[0].value));
+#elif
 		sleep(std::stoi(aj_helper->interpreter.stack[0].value));
+#endif
+		
 	}
 	return 0;
 }
@@ -74,5 +84,19 @@ int type() {
 		//std::cout << types[aj_helper->interpreter.stack[0].type] << std::endl;
 	}
 
+	return 1;
+}
+
+int append() {
+	if (aj_helper->interpreter.stack.size() >= 2) {
+		if (aj_helper->interpreter.stack[0].type == Variable::ARRAY) {
+			Variable elemToAdd = Variable(aj_helper->interpreter.stack[1].type, aj_helper->interpreter.stack[1].value);
+			Variable tmpArray = aj_helper->interpreter.stack[0];
+			tmpArray.array_values.push_back(elemToAdd);
+
+			aj_helper->interpreter.stack.clear();
+			aj_helper->interpreter.stack.push_back(tmpArray);
+		}
+	}
 	return 1;
 }

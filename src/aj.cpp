@@ -1,5 +1,9 @@
 #include<fstream>
+#ifdef _WIN32
+
+#elif
 #include<unistd.h>
+#endif
 #include "headers/aj.h"
 
 Aj::Aj() {

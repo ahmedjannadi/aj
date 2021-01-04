@@ -33,7 +33,7 @@ bool Tokenizer::isDigit(char c) {
 }
 
 bool Tokenizer::isOperator(char c) {
-	return checkChar(c,"-+*/%><=|&");
+	return checkChar(c,"-+*/%><=|&!");
 }
 
 bool Tokenizer::checkReserved(std::string token) {
